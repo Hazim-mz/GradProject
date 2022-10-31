@@ -1,26 +1,41 @@
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { GlobalStyles } from "../../constants/styles";
 
 
-function HallView({id, title, price, guests}){
+import HallImage from "./HallImage";
+
+function HallView({id, name, price, guests, imageUrl}){
+    const navigation = useNavigation(); //لانه مب صفحة
+
+    function selectHallHandler(){
+        navigation.navigate('HallPage', {
+            hallId: id,        
+        });
+    }
+    
     return(
         <View style={styles.container}>
-            <Pressable style={({pressed}) => (pressed ? styles.button : null)} >
-                <View style={styles.imageContainer}>
-                    <Image
-                        style={styles.image1} 
-                        source={require('../../assets/images/hall.jpg')}
-                    />
-                </View>
-
+            
+            <View style={{flex: 3}}>
+                <HallImage 
+                    data={imageUrl} 
+                    onPress={selectHallHandler}
+                    style={styles.imageContainer}
+                />
+            </View>
+            <Pressable 
+                style={({pressed}) => (pressed ? styles.button : null)}
+                onPress={selectHallHandler}
+            >
                 <View style={styles.infoContainer}>
 
                     <View style={styles.info}>
                         <View>
-                            <Text style={styles.boldName}>{title}</Text>
+                            <Text style={styles.boldName}>{name}</Text>
                         </View>
                         <View style={styles.info}>
                             <Ionicons style={styles.map} name="star" size='15' color='#bfba22' />
@@ -77,14 +92,16 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     imageContainer:{
-        flex: 3,
+        flex: 1,
         borderTopRightRadius: 8,
         borderTopLeftRadius: 8,
+        width: 359,
+        height: 282,
         overflow: 'hidden',
     },
     image1:{
-        width: 349,
-        height: 282
+        width: '100%',
+        height: '100%',
     },
     infoContainer:{
         flex: 1,

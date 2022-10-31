@@ -7,7 +7,11 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+
+function HallList({Halls, navigation}){
+
 function HallList({Halls}){
+
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -16,13 +20,14 @@ function HallList({Halls}){
     
     //كل اكله لها عنصر
     function renderHallInfo(itemData){
- 
         const item = itemData.item;
         const hallInfoProps ={
+            id: item.id, //هذا عشان نعرف ايدي قاعة اللي بننتقل لها بعدين
             id: item.id, //هذا عشان نعرف ايدي الاكله اللي بننتقل لها بعدين
             name: item.name,
             price: item.price,
-            guests: item.guests
+            guests: item.guests,
+            imageUrl: item.imageUrl
         };
         return (
             <HallView {...hallInfoProps}/>
@@ -30,7 +35,7 @@ function HallList({Halls}){
     }
 
     return( 
-        //الاكل الموجود بكل تصنيف
+        //عرض القاعات
         <View style={styles.view1}>
             <FlatList
                 style={styles.flat1}
@@ -39,6 +44,8 @@ function HallList({Halls}){
                 renderItem={renderHallInfo}
                 refreshControl={
                     <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
                       refreshing={refreshing}
                       onRefresh={onRefresh}
                     />
@@ -54,4 +61,7 @@ const styles = StyleSheet.create({
     view1:{
         flex: 1,
     },
-  });
+    flat1:{
+        flex: 1,
+    },
+});

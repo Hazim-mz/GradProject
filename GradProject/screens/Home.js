@@ -2,6 +2,57 @@ import { View, Text, Button, StyleSheet } from "react-native";
 import { useState } from "react";
 import Checkbox from 'expo-checkbox';
 
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { Fontisto } from '@expo/vector-icons'; 
+
+import HallList from "../components/common/HallList";
+import { HALLS } from '../data/dummy-data';
+
+function Home({navigation, route}){
+    const [enteredHall, setEnteredHall] = useState(HALLS);
+
+    function sortHandler(){
+        navigation.navigate('HomeSort');
+    }
+    function FilterHandler(){
+        navigation.navigate('HomeFilter');
+    }
+    function DateHandler(){
+        navigation.navigate('HomeDate');
+    }
+
+    useEffect(() => {
+        if (route.params?.highPrice) {
+            const highPriceHalls = enteredHall.sort((a, b) => {
+                return b.price - a.price;
+            });
+            setEnteredHall(highPriceHalls);
+            //console.log(enteredHall[0].price, enteredHall[1].price, enteredHall[2].price);
+        }
+        else if (route.params?.lowPrice) {
+            const lowPriceHalls = enteredHall.sort((a, b) => {
+                return a.price - b.price;
+            });
+            setEnteredHall(lowPriceHalls);
+        }
+        if (route.params?.highGuest) {
+            const highGuestHalls = enteredHall.sort((a, b) => {
+                return b.guests - a.guests;
+            });
+            setEnteredHall(highGuestHalls);
+        }
+        else if (route.params?.lowGuest) {
+            const lowGuestHalls = enteredHall.sort((a, b) => {
+                return a.guests - b.guests;
+            });
+            setEnteredHall(lowGuestHalls);
+        }
+    }, [route.params?.highPrice, route.params?.lowPriceHalls, route.params?.highGuest, route.params?.lowGuest, enteredHall]);
+
+    
+
+
 const initialState = {
     highPrice: false,
     lowPrice: false,
@@ -95,6 +146,12 @@ function HomeSort({navigation}){
                     <Text style={styles.checkboxName}>Low</Text>
                 </View>
             </View>
+            <View style={{flex: 3}}>
+                <View style={styles.hallContainer}>
+                    <HallList Halls={enteredHall}/>
+                </View>
+            </View>
+
             <Button
                 onPress={onPressHandler}
                 title="Save"
@@ -140,4 +197,12 @@ const styles = StyleSheet.create({
     checkboxName:{
         fontSize:16,
     },
+    hallContainer:{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent:'center',
+        alignSelf:'stretch',
+    },
+  });
+  
 });

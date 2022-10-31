@@ -7,9 +7,10 @@ import { Foundation } from '@expo/vector-icons';
 
 import { GlobalStyles } from './constants/styles';
 import Home from './screens/Home';
-import HomeSort from './screens/HomeSort';
-import HomeFilter from './screens/HomeFilter';
-import HomeDate from './screens/HomeDate';
+import HomeSort from './screens/HomeScreens/HomeSort';
+import HomeFilter from './screens/HomeScreens/HomeFilter';
+import HomeDate from './screens/HomeScreens/HomeDate';
+import HallPage from './screens/HallPage';
 import Inbox from './screens/Inbox';
 import Bookings from './screens/Bookings';
 import Account from './screens/Account';
@@ -21,14 +22,17 @@ function HomeOverview() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
+        headerStyle: { backgroundColor: GlobalStyles.colors.primary10 },
         headerTintColor: 'white',
       }}
     >
       <Stack.Screen
         name="Home"
         component={Home}
-        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="HallPage"
+        component={HallPage}
       />
       <Stack.Screen
         name="HomeSort"
@@ -67,6 +71,7 @@ export default function App() {
           screenOptions={() => ({
             headerStyle: { backgroundColor: GlobalStyles.colors.primary10 },
             headerTintColor: 'white',
+            headerShown: false,
             //tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
             tabBarActiveTintColor: GlobalStyles.colors.primary10,
           })}

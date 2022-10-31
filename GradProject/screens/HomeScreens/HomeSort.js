@@ -8,9 +8,8 @@ const initialState = {
     highGuest: false,
     lowGuest: false,
 };
-function HomeSort({navigation}){
+function HomeSort({navigation, route}){
     const [state, setState] = useState(initialState);
-    const [toggleButton, setToggleButton] = useState(false);
 
     function onPressHandler(){
         navigation.navigate({
@@ -21,7 +20,7 @@ function HomeSort({navigation}){
                 highGuest: state.highGuest,
                 lowGuest: state.lowGuest,
             },
-            merge: true,
+            //merge: true,
         });
     }
     
@@ -41,6 +40,7 @@ function HomeSort({navigation}){
                             setState({
                                 ...state,
                                 highPrice: value,
+                                lowPrice: !value,
                             })
                         }
                     />
@@ -55,6 +55,7 @@ function HomeSort({navigation}){
                             setState({
                                 ...state,
                                 lowPrice: value,
+                                highPrice: !value,
                             })
                         }
                     />
@@ -71,6 +72,7 @@ function HomeSort({navigation}){
                             setState({
                                 ...state,
                                 highGuest: value,
+                                lowGuest: !value,
                             })
                         }
                     />
@@ -85,6 +87,7 @@ function HomeSort({navigation}){
                             setState({
                                 ...state,
                                 lowGuest: value,
+                                highGuest: !value,
                             })
                         }
                     />
