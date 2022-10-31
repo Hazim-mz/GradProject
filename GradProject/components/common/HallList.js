@@ -7,11 +7,7 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-
 function HallList({Halls, navigation}){
-
-function HallList({Halls}){
-
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -23,7 +19,6 @@ function HallList({Halls}){
         const item = itemData.item;
         const hallInfoProps ={
             id: item.id, //هذا عشان نعرف ايدي قاعة اللي بننتقل لها بعدين
-            id: item.id, //هذا عشان نعرف ايدي الاكله اللي بننتقل لها بعدين
             name: item.name,
             price: item.price,
             guests: item.guests,
@@ -46,8 +41,6 @@ function HallList({Halls}){
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
                     />
                 }
             />
@@ -64,4 +57,4 @@ const styles = StyleSheet.create({
     flat1:{
         flex: 1,
     },
-});
+  });
