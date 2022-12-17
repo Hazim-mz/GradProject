@@ -5,17 +5,25 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import ServiecesIcon from '../components/hallCom/ServiecesIcon';
+import LodingOverlay from '../components/UI/LodingOverlay';
 
 import { auth,db,storage } from '../config'; 
 import { addDoc, collection } from 'firebase/firestore';
 
-const initialServices = {
-    teaBoy: false,
-    incense: false,
-    cooking: false,
-};
-//const initialServices = [{name:'teaBoy', isAvailable: true},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: true}]
+//const initialServices = {
+    //teaBoy: false,
+    //incense: false,
+    //cooking: false,
+//};
+const initialServices = [
+    {name:'teaBoy', isAvailable: false},
+    {name:'Incense', isAvailable: false},
+    {name:'Cooking', isAvailable: false}
+];
+
 function Inbox({route, navigation}){
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     //Services
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
@@ -47,6 +55,7 @@ function Inbox({route, navigation}){
     const upload = async() => {
 
         const uploadImage = async() => {
+            setIsSubmitting(true);
             for(var n =0 ; n < images.length; n++){
                 //1-convert image into blob image
 
@@ -122,13 +131,12 @@ function Inbox({route, navigation}){
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(imagesLocation.length);
-                }, 7000);
+                }, 5000);
             }); 
         }
         const uploadHall = async() => {
             await uploadImage();
             if(imagesLocation && name && price && guests){
-                console.log("I am in if");
                 const HallID = await addDoc(collection(db, "Halls"), {
                     OwnerEmail: '??',
                     Name: name,
@@ -146,6 +154,7 @@ function Inbox({route, navigation}){
                     setImages([]);
                     setDescription('');
                     setServices(initialServices);
+                    setIsSubmitting(false);
                     alert("Hall Add successsfilly");
                 })
                 navigation.navigate('Home');
@@ -153,8 +162,11 @@ function Inbox({route, navigation}){
                 alert("Please wait");
             }
         }
-
         uploadHall();
+    }
+
+    if(isSubmitting){
+        return <LodingOverlay />;
     }
 
     return(
@@ -181,6 +193,7 @@ function Inbox({route, navigation}){
                         placeholder="Hall Price"
                         onChangeText={newPrice => setPrice(newPrice)}
                         defaultValue={price}
+                        keyboardType="numeric"
                     />
                 </View>
 
@@ -191,6 +204,7 @@ function Inbox({route, navigation}){
                         placeholder="# Guests Number"
                         onChangeText={newGuest => setGuests(newGuest)}
                         defaultValue={guests}
+                        keyboardType="numeric"
                     />
                 </View>
 
@@ -251,13 +265,18 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={services.teaBoy}
-                                        //value={services[0].isAvailable}
+                                        //value={services.teaBoy}
+                                        value={services[0].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                teaBoy: value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'teaBoy') {
+                                                        return {...obj, isAvailable: value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>Yes</Text>
@@ -265,12 +284,18 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={! services.teaBoy}
+                                        //value={! services.teaBoy}
+                                        value={! services[0].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                teaBoy: !value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'teaBoy') {
+                                                        return {...obj, isAvailable: !value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>No</Text>
@@ -285,12 +310,17 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={services.incense}
+                                        value={services[1].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                incense: value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'Incense') {
+                                                        return {...obj, isAvailable: value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>Yes</Text>
@@ -298,12 +328,17 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={! services.incense}
+                                        value={! services[1].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                incense: !value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'Incense') {
+                                                        return {...obj, isAvailable: !value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>No</Text>
@@ -318,12 +353,17 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={services.cooking}
+                                        value={services[2].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                cooking: value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'Cooking') {
+                                                        return {...obj, isAvailable: value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>Yes</Text>
@@ -331,12 +371,17 @@ function Inbox({route, navigation}){
                                 <View>
                                     <Checkbox
                                         style={styles.checkbox}
-                                        value={! services.cooking}
+                                        value={! services[2].isAvailable}
                                         onValueChange={value =>
-                                            setServices({
-                                                ...services,
-                                                cooking: !value,
-                                            })
+                                            setServices(current =>
+                                                current.map(obj => {
+                                                    if (obj.name === 'Cooking') {
+                                                        return {...obj, isAvailable: !value};
+                                                    }
+                                          
+                                                    return obj;
+                                                }),
+                                            )
                                         }
                                     />
                                     <Text style={styles.checkboxText}>No</Text>
