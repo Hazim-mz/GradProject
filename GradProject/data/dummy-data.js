@@ -8,7 +8,7 @@ export const HALLS = [
     25, 
     [{id:1, uri:require('../assets/images/hall.jpg')}, {id:2, uri:require('../assets/images/hall2.jpg')}], 
     'AAAAAAAAAAAAAAAA', 
-    [true, false, true]
+    [{name:'teaBoy', isAvailable: true},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: true}]//teaBoy, incense, cooking
   ),
 
   new Hall(
@@ -18,7 +18,7 @@ export const HALLS = [
     44, 
     [{id:3, uri:require('../assets/images/hall.jpg')}, {id:4, uri:require('../assets/images/hall2.jpg')}], 
     'BBBBBBBBBBBBBBBBBBBBB', 
-    [true, true, true]
+    [{name:'teaBoy', isAvailable: true},{name:'Incense', isAvailable: true},{name:'Cooking', isAvailable: true}]
   ),
 
   new Hall(
@@ -28,7 +28,7 @@ export const HALLS = [
     34, 
     [{id:5, uri:require('../assets/images/hall.jpg')}, {id:6, uri:require('../assets/images/hall2.jpg')}], 
     'CCCCCCCCCCCCCCCCCCCCCC', 
-    [true, false, false]
+    [{name:'teaBoy', isAvailable: true},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: false}]
   ),
 
   new Hall(
@@ -38,7 +38,7 @@ export const HALLS = [
     15, 
     [{id:7, uri:require('../assets/images/hall.jpg')}, {id:8, uri:require('../assets/images/hall2.jpg')}], 
     'DDDDDDDDDDDDDDDDDDDDDDDDDDDDD', 
-    [false, false, true]
+    [{name:'teaBoy', isAvailable: false},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: true}]
   ),
 
   new Hall(
@@ -48,7 +48,7 @@ export const HALLS = [
     22, 
     [{id:9, uri:require('../assets/images/hall.jpg')}, {id:10, uri:require('../assets/images/hall2.jpg')}], 
     'EEEEEEEEEEE', 
-    [true, false, true]
+    [{name:'teaBoy', isAvailable: true},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: true}]
   ),
   new Hall(
     6, 
@@ -57,6 +57,6 @@ export const HALLS = [
     27, 
     [{id:11, uri:require('../assets/images/hall.jpg')}, {id:12, uri:require('../assets/images/hall2.jpg')}], 
     'FFFFFFFFFFFFFFFFFFFFFFF', 
-    [false, false, true]
+    [{name:'teaBoy', isAvailable: false},{name:'Incense', isAvailable: false},{name:'Cooking', isAvailable: true}]
   ),
 ];
