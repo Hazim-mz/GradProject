@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
 
 function HallImage({data, onPress, style}){
     const [imageActive, setImageActive] = useState(0);
@@ -13,35 +13,37 @@ function HallImage({data, onPress, style}){
 
     return(
         <View style={styles.Container}>
-            <FlatList
+            <ScrollView
+                scrollEventThrottle={16}
                 pagingEnabled
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 onScroll={onScrollHandler}
-                data={data}
-                keyExtractor={(item) => item.id}
-                renderItem={(itemData) => {
-                    return(
+            >
+                {
+                    data.map((image, index) => (
                         <Pressable 
+                        key={index}
                         style={({pressed}) => (pressed ? styles.button : null)}
                         onPress={onPress}
                         >
                             <View style={style}>
                                 <Image 
-                                    source={itemData.item.uri}
+                                    key={image.id}
+                                    source={image.uri}
                                     style={styles.image1}
                                 />
                             </View>
                         </Pressable>
-                    );
-                }}
-            />
+                    ))
+                }
+            </ScrollView>
             <View style={styles.textContainer}>
                 {
                     data.map((image, index) => (
                         <Text 
                             key={index} 
-                            style={index ===imageActive ? styles.text2 : styles.text1}
+                            style={index === imageActive ? styles.text2 : styles.text1}
                         >
                             ⬤
                         </Text>
