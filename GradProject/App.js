@@ -71,7 +71,6 @@ export default function App() {
           screenOptions={() => ({
             headerStyle: { backgroundColor: GlobalStyles.colors.primary10 },
             headerTintColor: 'white',
-            headerShown: false,
             //tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
             tabBarActiveTintColor: GlobalStyles.colors.primary10,
           })}
@@ -80,6 +79,7 @@ export default function App() {
             name="HomeOverview"
             component={HomeOverview}
             options={{
+              headerShown: false,
               title: 'Home',
               tabBarLabel: 'Home',
               tabBarIcon: ({ color, size }) => (
@@ -114,7 +114,7 @@ export default function App() {
             component={Account}
             options={{
               title: 'Account',
-              tabBarLabel: 'Acco unt',
+              tabBarLabel: 'Account',
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="person" size={size} color={color} />
               ),
