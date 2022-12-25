@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Button,StyleSheet } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -18,8 +18,12 @@ import HallForm from "../components/ManageHall/HallForm";
 import EnterReview from "../components/hallCom/EnterReview";
 import HallComment from "../components/hallCom/HallComment";
 
+import { auth,db,storage } from '../config'; 
+import { addDoc, collection } from 'firebase/firestore';
+
 
 function HallPage({route, navigation}){
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => {
@@ -35,16 +39,36 @@ function HallPage({route, navigation}){
     }, [navigation]);
 
     //معلومات القاعة
-    const HallId = route.params.hallId;
-    const displayedHall = HALLS.filter((hallItem) => {
-        return hallItem.id == HallId;
-    });
+    const displayedHall ={
+        id: route.params.hallId,
+        name: route.params.hallName,
+        description: route.params.hallDescription,
+        price: route.params.hallPrice,
+        guests: route.params.hallGuests,
+        imageUrl: route.params.hallImageUrl,
+        services: route.params.hallServices,
+        bookedDays: route.params.hallBookedDays
+    };
+
+
     const displayedComment = COMMENTS.filter((commentItem) => {
-        return commentItem.hallID == HallId;
+        return commentItem.hallID == displayedHall.id;
     });
 
     function pressLoctionHandler(){
         return;
+    }
+    const hallReservation = async(hallsID, date, price, userID) => {
+        const ReservationID = await addDoc(collection(db, "Reservation"), {
+            HallsID: hallsID,
+            Date: date,
+            Price: price,
+            UserID: userID
+        }).
+        then(()=>{
+            alert("The hall is booked successsfilly");
+        })
+        navigation.navigate('Bookings');
     }
 
     return(
@@ -52,7 +76,7 @@ function HallPage({route, navigation}){
             <ScrollView style={{flex: 1}}>
                 <View style={{flex: 1}}>
                     <HallImage 
-                        data={displayedHall[0].imageUrl}
+                        data={displayedHall.imageUrl}
                         style={styles.imageContainer}
                     />
                 </View>
@@ -62,22 +86,22 @@ function HallPage({route, navigation}){
                         <View style={styles.InfoContainer}>
 
                             {/* المعلومات الاساسية */}
-                            <MainInformation data={displayedHall} onPress={pressLoctionHandler}/>
+                            <MainInformation data={displayedHall} onPressLocation={pressLoctionHandler} onPressBook={hallReservation} />
 
                             <View style={styles.line}></View>
 
                             {/* المعلومات الغرف */}
                             <RoomInformation />
-
+                            
                             <View style={styles.line}></View>
 
                             <View style={styles.descServContainer}>
 
                                 {/* تعريف القاعة  */}
-                                <DescriptionInformation description={displayedHall[0].description}/>
+                                <DescriptionInformation description={displayedHall.description}/>
 
                                 {/* الخدمات */}
-                                <ServiecesInformation services={displayedHall[0].services}/>
+                                <ServiecesInformation services={displayedHall.services}/>
                                 
                             </View>
 
@@ -112,6 +136,16 @@ const styles = StyleSheet.create({
     },
     InfoContainer:{
         flex: 1,
+    },
+    mainInfoContainer:{
+        flex: 1,
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+        marginHorizontal: 4,
+        borderRadius: 3,
+        backgroundColor: 'white',
+        flexDirection: 'column',
+        
     },
     line:{
         borderBottomWidth: 1,
