@@ -7,7 +7,7 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-function HallList({Halls, navigation}){
+function HallList({Halls, BookedDays, navigation}){
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -17,12 +17,21 @@ function HallList({Halls, navigation}){
     //كل اكله لها عنصر
     function renderHallInfo(itemData){
         const item = itemData.item;
+        let bookedDays = [];
+        for(var i=0; i<BookedDays.length; i++){
+            if(BookedDays[i].data.HallsID == item.id){
+                bookedDays.push(BookedDays[i].data.Date)
+            }
+        }
         const hallInfoProps ={
             id: item.id, //هذا عشان نعرف ايدي قاعة اللي بننتقل لها بعدين
-            name: item.name,
-            price: item.price,
-            guests: item.guests,
-            imageUrl: item.imageUrl
+            name: item.data.Name,
+            description: item.data.Description,
+            price: item.data.Price,
+            guests: item.data.Guests,
+            imageUrl: item.data.imageUrl,
+            services: item.data.Services,
+            bookedDays: bookedDays
         };
         return (
             <HallView {...hallInfoProps}/>
