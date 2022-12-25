@@ -1,60 +1,58 @@
-import { useEffect, useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+
+import { collection, setDoc, doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../config';
 
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { Fontisto } from '@expo/vector-icons'; 
 
-import HallList from "../components/common/HallList";
-import { HALLS } from '../data/dummy-data';
+import HallList from '../components/common/HallList';
+import Sort from '../components/homeCom/Sort';
 
 function Home({navigation, route}){
-    const [enteredHall, setEnteredHall] = useState(HALLS);
+    const [Halls, setHalls] = useState([]);
+    const [bookedDays, setBookedDays] = useState([]);
 
-    function sortHandler(){
-        navigation.navigate('HomeSort');
+    const [sortIsVisible, setSortIsVisible] = useState(false);
+    function openSort(){
+        setSortIsVisible(true);
     }
-    function FilterHandler(){
-        navigation.navigate('HomeFilter');
+    function closeSort(){
+        setSortIsVisible(false);
     }
-    function DateHandler(){
-        navigation.navigate('HomeDate');
+    function SortHalls(Halls){
+        setHalls(Halls);
     }
 
-    useEffect(() => {
-        if (route.params?.highPrice) {
-            const highPriceHalls = enteredHall.sort((a, b) => {
-                return b.price - a.price;
-            });
-            setEnteredHall(highPriceHalls);
-            //console.log(enteredHall[0].price, enteredHall[1].price, enteredHall[2].price);
-        }
-        else if (route.params?.lowPrice) {
-            const lowPriceHalls = enteredHall.sort((a, b) => {
-                return a.price - b.price;
-            });
-            setEnteredHall(lowPriceHalls);
-        }
-        if (route.params?.highGuest) {
-            const highGuestHalls = enteredHall.sort((a, b) => {
-                return b.guests - a.guests;
-            });
-            setEnteredHall(highGuestHalls);
-        }
-        else if (route.params?.lowGuest) {
-            const lowGuestHalls = enteredHall.sort((a, b) => {
-                return a.guests - b.guests;
-            });
-            setEnteredHall(lowGuestHalls);
-        }
-    }, [route.params?.highPrice, route.params?.lowPriceHalls, route.params?.highGuest, route.params?.lowGuest, enteredHall]);
+    //call Halls from DB
+    useLayoutEffect(() => {
+        const ref = collection(db, "Halls");
+        onSnapshot(ref, (Halls) =>
+            setHalls(Halls.docs.map((Hall) =>({
+                    id: Hall.id,
+                    data: Hall.data()
+                }))
+            )
+        );
 
-    
-
+        const reff = collection(db, "Reservation");
+        onSnapshot(reff, (Reservation) =>
+            setBookedDays(Reservation.docs.map((reservations) =>({
+                    id: reservations.id,
+                    data: reservations.data()
+                }))
+            )
+        );
+       
+    }, []);
     
 
     return(
         <View style={styles.container}>
+
+            <Sort Halls={Halls} SortHalls={SortHalls} visible={sortIsVisible} close={closeSort}/>
 
             <View style={styles.searchBar}>
 
@@ -66,7 +64,7 @@ function Home({navigation, route}){
                 <View style={styles.searchBar2}>
                     <Pressable 
                         style={({pressed}) => (pressed ? styles.button : null)} 
-                        onPress={sortHandler}
+                        onPress={openSort}
                     >
                         <View style={styles.icon}>
                             <MaterialCommunityIcons name="sort" size={30} color="#6A2B81" />
@@ -75,7 +73,7 @@ function Home({navigation, route}){
                     </Pressable>
                     <Pressable 
                         style={({pressed}) => (pressed ? styles.button : null)}
-                        onPress={FilterHandler} 
+                        onPress={openSort} 
                     >
                         <View style={styles.icon}>
                             <MaterialCommunityIcons name="filter" size={30} color="#6A2B81" />
@@ -84,7 +82,7 @@ function Home({navigation, route}){
                     </Pressable>
                     <Pressable 
                         style={({pressed}) => (pressed ? styles.button : null)}
-                        onPress={DateHandler} 
+                        onPress={openSort} 
                     >                        
                         <View style={styles.icon}>
                             <Fontisto name="date" size={30} color="#6A2B81" />
@@ -97,7 +95,7 @@ function Home({navigation, route}){
 
             <View style={{flex: 3}}>
                 <View style={styles.hallContainer}>
-                    <HallList Halls={enteredHall}/>
+                    <HallList Halls={Halls} BookedDays={bookedDays}/>
                 </View>
             </View>
         </View>
