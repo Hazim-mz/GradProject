@@ -1,21 +1,39 @@
 import { View, Text, Pressable, ScrollView,StyleSheet } from "react-native";
+import { useEffect, useState } from 'react';
 
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons'; 
 
 import { GlobalStyles } from "../../constants/styles";
+import Date from "./Date";
 
-function MainInformation({data, onPress}){ 
+function MainInformation({data, onPressLocation, onPressBook}){ 
+
+    const [date, setDate] = useState('');
+    const [calendarIsVisible, setCalendarIsVisible] = useState(false);
+    function openCalendar(){
+        setCalendarIsVisible(true);
+    }
+    function closeCalendar(){
+        setCalendarIsVisible(false);
+    }
+    function changedate(date){
+        setDate(date);
+        closeCalendar();
+    }
+
     return(
         <View style={styles.mainInfoContainer}>
 
+            <Date visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {data.bookedDays} length={data.bookedDays.length}/>
+
             <View style={styles.maininfo}>
                 <View>
-                    <Text style={styles.boldName}>{data[0].name}</Text>
+                    <Text style={styles.boldName}>{data.name}</Text>
                 </View>
                 <View style={styles.maininfo2}>
-                    <Text style={styles.boldName}>{data[0].price}</Text>
+                    <Text style={styles.boldName}>{data.price}</Text>
                     <Text style={styles.normalName}> SR</Text>
                 </View>
             </View>
@@ -30,7 +48,7 @@ function MainInformation({data, onPress}){
                         />
                     </View>
                     <View style={styles.guestsInfoContainer}>
-                        <Text style={{fontSize:17}}>{data[0].guests}, </Text>
+                        <Text style={{fontSize:17}}>{data.guests}, </Text>
                         <Text style={{fontSize:17}}>Guests</Text>
                     </View>
                 </View>
@@ -47,7 +65,7 @@ function MainInformation({data, onPress}){
                     style={({pressed}) => (
                         pressed ? [styles.button, styles.maininfo2] : styles.maininfo2
                     )}
-                    onPress={onPress}
+                    onPress={onPressLocation}
                 >
                     <View>
                         <FontAwesome5 
@@ -60,6 +78,47 @@ function MainInformation({data, onPress}){
                         <Text style={{fontSize:14, fontWeight:'bold'}}>Location</Text>
                     </View>
                 </Pressable>
+
+                <View style={styles.BookContainer}>
+                    <View style={styles.calendar}>
+                        <Pressable
+                                style={({pressed}) => (
+                                    pressed ? styles.button : null
+                                )}
+                                onPress={openCalendar}
+                            >
+                            <Ionicons name="calendar" size={24} color="black" />
+                        </Pressable>
+                    </View>
+                    <View>
+                        {
+                            date == '' ?
+                                <Pressable
+                                    style={({pressed}) => (
+                                        pressed ? styles.button : null
+                                    )}
+                                    onPress={() => {alert('Choose the date first');}}
+                                >
+                                    <View style={styles.buttonDesignNoClick}>
+                                        <Text style={{color: 'black', fontWeight: 'bold'}}>Book</Text>
+                                    </View>
+                                </Pressable>
+                            :
+                                <Pressable
+                                    style={({pressed}) => (
+                                        pressed ? styles.button : null
+                                    )}
+                                    onPress={onPressBook.bind(this, data.id, date, data.price, '???')}
+                                >
+                                    <View style={styles.buttonDesign}>
+                                        <Text style={{color: 'white', fontWeight: 'bold'}}>Book</Text>
+                                    </View>
+                                </Pressable>
+                        }
+                        
+                    </View>
+                </View>
+
             </View>
         </View>
     );
@@ -114,6 +173,13 @@ const styles = StyleSheet.create({
         marginTop: 6,
         marginLeft: 3,
     },
+    BookContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    calendar:{
+        marginRight: 8
+    },
     line:{
         borderBottomWidth: 1,
         paddingBottom: 6,
@@ -126,6 +192,23 @@ const styles = StyleSheet.create({
     },
     normalName:{
         fontSize: 20,
+    },
+    buttonDesignNoClick:{
+        height: 30,
+        width: 70,
+        borderRadius: 5,
+        borderWidth:1,
+        borderColor: '#a19c8f',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonDesign:{
+        height: 30,
+        width: 70,
+        borderRadius: 5,
+        backgroundColor: GlobalStyles.colors.primary10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     button:{
         opacity: 0.8,
