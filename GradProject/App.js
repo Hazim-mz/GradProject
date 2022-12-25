@@ -7,9 +7,6 @@ import { Foundation } from '@expo/vector-icons';
 
 import { GlobalStyles } from './constants/styles';
 import Home from './screens/Home';
-import HomeSort from './screens/HomeScreens/HomeSort';
-import HomeFilter from './screens/HomeScreens/HomeFilter';
-import HomeDate from './screens/HomeScreens/HomeDate';
 import HallPage from './screens/HallPage';
 import Inbox from './screens/Inbox';
 import Bookings from './screens/Bookings';
@@ -34,37 +31,14 @@ function HomeOverview() {
         name="HallPage"
         component={HallPage}
       />
-      <Stack.Screen
-        name="HomeSort"
-        component={HomeSort}
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="HomeFilter"
-        component={HomeFilter}
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="HomeDate"
-        component={HomeDate}
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
+
     </Stack.Navigator>
   );
 }
 export default function App() {
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style="auto" />
 
       <NavigationContainer>
         <BottomTabs.Navigator
