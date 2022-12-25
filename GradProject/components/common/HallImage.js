@@ -29,8 +29,8 @@ function HallImage({data, onPress, style}){
                         >
                             <View style={style}>
                                 <Image 
-                                    key={image.id}
-                                    source={image.uri}
+                                    key={index}
+                                    source={{uri: image}}
                                     style={styles.image1}
                                 />
                             </View>
