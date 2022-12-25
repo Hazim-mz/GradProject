@@ -7,13 +7,22 @@ import { GlobalStyles } from "../../constants/styles";
 
 
 import HallImage from "./HallImage";
+import DescriptionInformation from "../hallCom/DescriptionInformation";
 
-function HallView({id, name, price, guests, imageUrl}){
+
+function HallView({id, name, description, price, guests, imageUrl, services, bookedDays}){
     const navigation = useNavigation(); //لانه مب صفحة
 
     function selectHallHandler(){
         navigation.navigate('HallPage', {
-            hallId: id,        
+            hallId: id,
+            hallName: name,
+            hallDescription: description,
+            hallPrice: price,
+            hallGuests: guests,
+            hallImageUrl: imageUrl,      
+            hallServices: services,
+            hallBookedDays: bookedDays,
         });
     }
     
