@@ -1,95 +1,216 @@
 import { View, Text, Pressable, ScrollView,StyleSheet } from "react-native";
+import { useEffect, useState } from 'react';
 
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { FontAwesome5 } from '@expo/vector-icons'; 
 
+import { GlobalStyles } from "../../constants/styles";
+import Date from "./Date";
 
-function RoomInformation(){
+function MainInformation({data, onPressLocation, onPressBook}){ 
+
+    const [date, setDate] = useState('');
+    const [calendarIsVisible, setCalendarIsVisible] = useState(false);
+    function openCalendar(){
+        setCalendarIsVisible(true);
+    }
+    function closeCalendar(){
+        setCalendarIsVisible(false);
+    }
+    function changedate(date){
+        setDate(date);
+        closeCalendar();
+    }
+
     return(
-        <View style={styles.container}>
-            <View style={styles.roomInformationTitle}>
-                <Text style={styles.boldName}>Hall Rooms Information :</Text>
+        <View style={styles.mainInfoContainer}>
+
+            <Date visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {data.bookedDays} length={data.bookedDays.length}/>
+
+            <View style={styles.maininfo}>
+                <View>
+                    <Text style={styles.boldName}>{data.name}</Text>
+                </View>
+                <View style={styles.maininfo2}>
+                    <Text style={styles.boldName}>{data.price}</Text>
+                    <Text style={styles.normalName}> SR</Text>
+                </View>
             </View>
-            <ScrollView 
-                style={styles.roomInformationContainer}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-            >
-                <View style={styles.roomInformation}>
-                    <Ionicons name="man" size={40} color="black" />
-                    <Text style={styles.boldName2}>1 men's council</Text>
-                    <Text style={styles.normalName}>16x12</Text>
+
+            <View style={styles.maininfo}>
+                <View style={styles.maininfo2}>
+                    <View>
+                        <MaterialCommunityIcons 
+                            name="account-group" 
+                            size={30} 
+                            color={GlobalStyles.colors.primary10} 
+                        />
+                    </View>
+                    <View style={styles.guestsInfoContainer}>
+                        <Text style={{fontSize:17}}>{data.guests}, </Text>
+                        <Text style={{fontSize:17}}>Guests</Text>
+                    </View>
                 </View>
-                <View style={styles.roomInformation}>
-                    <Ionicons name="woman" size={35} color="black" />
-                    <Text style={styles.boldName2}>1 woman's council</Text>
-                    <Text style={styles.normalName}>16x12</Text>
+                <View style={styles.guestsInfoContainer}>
+                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
+                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
+                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
+                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
                 </View>
-                <View style={styles.roomInformation}>
-                    <Ionicons name="man" size={40} color="black" />
-                    <Text style={styles.boldName2}>8 men's bathroom</Text>
-                    <Text style={styles.normalName}>2x3</Text>
+            </View>
+
+            <View style={styles.maininfo3}>
+                <Pressable 
+                    style={({pressed}) => (
+                        pressed ? [styles.button, styles.maininfo2] : styles.maininfo2
+                    )}
+                    onPress={onPressLocation}
+                >
+                    <View>
+                        <FontAwesome5 
+                            name="map-marked-alt" 
+                            size={25} 
+                            color= {GlobalStyles.colors.primary10} 
+                        />
+                    </View>
+                    <View style={styles.loctionInfoContainer}>
+                        <Text style={{fontSize:14, fontWeight:'bold'}}>Location</Text>
+                    </View>
+                </Pressable>
+
+                <View style={styles.BookContainer}>
+                    <View style={styles.calendar}>
+                        <Pressable
+                                style={({pressed}) => (
+                                    pressed ? styles.button : null
+                                )}
+                                onPress={openCalendar}
+                            >
+                            <Ionicons name="calendar" size={24} color="black" />
+                        </Pressable>
+                    </View>
+                    <View>
+                        {
+                            date == '' ?
+                                <Pressable
+                                    style={({pressed}) => (
+                                        pressed ? styles.button : null
+                                    )}
+                                    onPress={() => {alert('Choose the date first');}}
+                                >
+                                    <View style={styles.buttonDesignNoClick}>
+                                        <Text style={{color: 'black', fontWeight: 'bold'}}>Book</Text>
+                                    </View>
+                                </Pressable>
+                            :
+                                <Pressable
+                                    style={({pressed}) => (
+                                        pressed ? styles.button : null
+                                    )}
+                                    onPress={onPressBook.bind(this, data.id, date, data.price, '???')}
+                                >
+                                    <View style={styles.buttonDesign}>
+                                        <Text style={{color: 'white', fontWeight: 'bold'}}>Book</Text>
+                                    </View>
+                                </Pressable>
+                        }
+                        
+                    </View>
                 </View>
-                <View style={styles.roomInformation}>
-                    <Ionicons name="woman" size={35} color="black" />
-                    <Text style={styles.boldName2}>10 woman's council</Text>
-                    <Text style={styles.normalName}>2x3</Text>
-                </View>
-            </ScrollView>
+
+            </View>
         </View>
     );
 }
 
-export default RoomInformation;
+export default MainInformation;
 
 const styles = StyleSheet.create({
     container:{
         flex: 1,
-        marginHorizontal:4,
-        borderRadius:3,
     },
-    roomInformationTitle:{
+    imageContainer:{
         flex: 1,
-        backgroundColor: 'white',
-        borderRadius:3,
-        borderBottomRightRadius:0,
-        paddingTop:8,
-        paddingLeft:6,
+        width: 375,
+        height: 282,
+        overflow: 'hidden',
     },
-    roomInformationContainer:{
+    InfoContainer:{
         flex: 1,
-        height:170,
-        backgroundColor: 'white',
-        borderRadius:3,
-        borderTopRightRadius:0,
     },
-    roomInformation:{
+    mainInfoContainer:{
         flex: 1,
-        height:120,
-        width: 120,
-        marginTop:24,
-        marginHorizontal:20,
-        backgroundColor: '#dfa4f5',
-        borderWidth: 2,
-        borderRadius: 4,
-        justifyContent: 'center',
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+        marginHorizontal: 4,
+        borderRadius: 3,
+        backgroundColor: 'white'
+    },
+    maininfo:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginVertical: 3,
+        
+    },
+    maininfo2:{
+        flexDirection: 'row',
+    },
+    maininfo3:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginVertical: 3,
+    },
+    guestsInfoContainer:{
+        flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: 'black',
-        shadowOffset:{width: 0, height: 2},
-        shadowRadius: 8,
-        shadowOpacity: 0.15,
-        overflow: Platform.OS === 'android' ? 'hidden' : 'visible', 
+        marginTop: 6,
+        marginLeft: 2,
+    },
+    loctionInfoContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 6,
+        marginLeft: 3,
+    },
+    BookContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    calendar:{
+        marginRight: 8
+    },
+    line:{
+        borderBottomWidth: 1,
+        paddingBottom: 6,
+        marginHorizontal: 30,
+        marginVertical: 4,
     },
     boldName:{
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
-    },
-    boldName2:{
-        fontSize: 12,
-        fontWeight: 'bold',
-        textAlign:'center',
     },
     normalName:{
-        fontSize: 12,
-        textAlign:'center',
+        fontSize: 20,
+    },
+    buttonDesignNoClick:{
+        height: 30,
+        width: 70,
+        borderRadius: 5,
+        borderWidth:1,
+        borderColor: '#a19c8f',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonDesign:{
+        height: 30,
+        width: 70,
+        borderRadius: 5,
+        backgroundColor: GlobalStyles.colors.primary10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    button:{
+        opacity: 0.8,
     },
 });
