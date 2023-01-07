@@ -56,7 +56,6 @@ function Sort({Halls, SortHalls, visible, close}){
                         <Checkbox
                             style={styles.checkbox}
                             value={state.highPrice}
-                            disabled={state.lowPrice}
                             onValueChange={value =>
                                 setState({
                                     ...state,
@@ -71,7 +70,6 @@ function Sort({Halls, SortHalls, visible, close}){
                         <Checkbox
                             style={styles.checkbox}
                             value={state.lowPrice}
-                            disabled={state.highPrice}
                             onValueChange={value =>
                                 setState({
                                     ...state,
@@ -88,7 +86,6 @@ function Sort({Halls, SortHalls, visible, close}){
                         <Checkbox
                             style={styles.checkbox}
                             value={state.highGuest}
-                            disabled={state.lowGuest}
                             onValueChange={value =>
                                 setState({
                                     ...state,
@@ -103,7 +100,6 @@ function Sort({Halls, SortHalls, visible, close}){
                         <Checkbox
                             style={styles.checkbox}
                             value={state.lowGuest}
-                            disabled={state.highGuest}
                             onValueChange={value =>
                                 setState({
                                     ...state,
