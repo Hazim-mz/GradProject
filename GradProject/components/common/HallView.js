@@ -10,7 +10,7 @@ import HallImage from "./HallImage";
 import DescriptionInformation from "../hallCom/DescriptionInformation";
 
 
-function HallView({id, name, description, price, guests, imageUrl, services, bookedDays}){
+function HallView({id, name, description, price, guests, imageUrl, services, bookedDays, locationOfHall, locationOfUser}){
     const navigation = useNavigation(); //لانه مب صفحة
 
     function selectHallHandler(){
@@ -23,6 +23,8 @@ function HallView({id, name, description, price, guests, imageUrl, services, boo
             hallImageUrl: imageUrl,      
             hallServices: services,
             hallBookedDays: bookedDays,
+            locationOfHall: locationOfHall,
+            locationOfUser: locationOfUser,
         });
     }
     
