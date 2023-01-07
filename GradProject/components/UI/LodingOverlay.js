@@ -1,8 +1,9 @@
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 
-function LodingOverlay(){
+function LodingOverlay({text}){
     return(
         <View style={styles.view1}>
+            <Text style={styles.text1}>{text}</Text>
             <ActivityIndicator size="large" color="white"/>
         </View>
     );
@@ -17,5 +18,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 24,
         backgroundColor: '#E8E8E8',
+    },
+    text1:{
+        marginBottom:  4,
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
