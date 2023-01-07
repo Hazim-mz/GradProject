@@ -7,7 +7,7 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-function HallList({Halls, BookedDays, navigation}){
+function HallList({Halls, BookedDays, LocationOfUser, navigation}){
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -31,7 +31,9 @@ function HallList({Halls, BookedDays, navigation}){
             guests: item.data.Guests,
             imageUrl: item.data.imageUrl,
             services: item.data.Services,
-            bookedDays: bookedDays
+            bookedDays: bookedDays,
+            locationOfHall: item.data.Location,
+            locationOfUser: LocationOfUser
         };
         return (
             <HallView {...hallInfoProps}/>
