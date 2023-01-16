@@ -1,4 +1,4 @@
-import { useState,useCallback } from "react";
+import { useState,useCallback, useEffect } from "react";
 import { View, FlatList, RefreshControl, StyleSheet } from 'react-native';
 
 import HallView from "./HallView";
@@ -7,22 +7,17 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-function HallList({Halls, BookedDays, LocationOfUser, navigation}){
+function HallList({Halls ,LocationOfUser, navigation}){
     const [refreshing, setRefreshing] = useState(false);
+    
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         wait(500).then(() => setRefreshing(false));
     }, []);
-    
+
     //كل اكله لها عنصر
     function renderHallInfo(itemData){
         const item = itemData.item;
-        let bookedDays = [];
-        for(var i=0; i<BookedDays.length; i++){
-            if(BookedDays[i].data.HallsID == item.id){
-                bookedDays.push(BookedDays[i].data.Date)
-            }
-        }
         const hallInfoProps ={
             id: item.id, //هذا عشان نعرف ايدي قاعة اللي بننتقل لها بعدين
             name: item.data.Name,
@@ -31,9 +26,10 @@ function HallList({Halls, BookedDays, LocationOfUser, navigation}){
             guests: item.data.Guests,
             imageUrl: item.data.imageUrl,
             services: item.data.Services,
-            bookedDays: bookedDays,
             locationOfHall: item.data.Location,
-            locationOfUser: LocationOfUser
+            locationOfUser: LocationOfUser,
+            report: item.data.Report,
+            rate: item.data.Rate,
         };
         return (
             <HallView {...hallInfoProps}/>
