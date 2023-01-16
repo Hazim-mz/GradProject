@@ -7,6 +7,8 @@ const initialState = {
     lowPrice: false,
     highGuest: false,
     lowGuest: false,
+    nearLocation: false,
+    farLocation: false,
 };
 
 function Sort({Halls, SortHalls, visible, close}){
@@ -36,6 +38,18 @@ function Sort({Halls, SortHalls, visible, close}){
                 return a.data.Guests - b.data.Guests;
             });
             SortHalls.bind(this, lowGuestHalls);
+        }
+        if(state.farLocation) {
+            const farLocationHalls = Halls.sort((a, b) => {
+                return (b.data.Location.latitude - a.data.Location.latitude)+(b.data.Location.longitude - a.data.Location.longitude);
+            });
+            SortHalls.bind(this, farLocationHalls);
+        }
+        else if(state.nearLocation) {
+            const nearLocationHalls = Halls.sort((a, b) => {
+                return (a.data.Location.latitude - b.data.Location.latitude)+(a.data.Location.longitude - b.data.Location.longitude);
+            });
+            SortHalls.bind(this, nearLocationHalls);
         }
     }, [state]);
 
@@ -81,6 +95,7 @@ function Sort({Halls, SortHalls, visible, close}){
                         <Text style={styles.checkboxName}>Low</Text>
                     </View>
 
+
                     <Text style={styles.checkTitle}>Gusets:</Text>
                     <View style={styles.checkboxContainer}>
                         <Checkbox
@@ -109,6 +124,37 @@ function Sort({Halls, SortHalls, visible, close}){
                             }
                         />
                         <Text style={styles.checkboxName}>Low</Text>
+                    </View>
+
+
+                    <Text style={styles.checkTitle}>Loction:</Text>
+                    <View style={styles.checkboxContainer}>
+                        <Checkbox
+                            style={styles.checkbox}
+                            value={state.farLocation}
+                            onValueChange={value =>
+                                setState({
+                                    ...state,
+                                    farLocation: value,
+                                    nearLocation: !value,
+                                })
+                            }
+                        />
+                        <Text style={styles.checkboxName}>Far</Text>
+                    </View>
+                    <View style={styles.checkboxContainer}>
+                        <Checkbox
+                            style={styles.checkbox}
+                            value={state.nearLocation}
+                            onValueChange={value =>
+                                setState({
+                                    ...state,
+                                    nearLocation: value,
+                                    farLocation: !value,
+                                })
+                            }
+                        />
+                        <Text style={styles.checkboxName}>Near</Text>
                     </View>
                 </View>
                 <Button
