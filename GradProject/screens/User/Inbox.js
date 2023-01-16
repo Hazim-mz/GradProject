@@ -63,7 +63,7 @@ function Inbox({route, navigation}){
             });
             setIsSubmitting(false);
         })();
-    }, [locationOfUser]);
+    }, []);
     var tempLatitude;
     var tempLongitude;
 
@@ -181,7 +181,9 @@ function Inbox({route, navigation}){
                     imageUrl: imagesLocation,
                     Description: description,
                     Services: services,
-                    Location: locationOfHall
+                    Location: locationOfHall,
+                    Report: 0,
+                    Rate: 0,
                 }).
                 then(()=>{
                     setName('');
@@ -299,8 +301,8 @@ function Inbox({route, navigation}){
                             initialRegion={{
                                 longitude: locationOfUser.longitude,
                                 latitude: locationOfUser.latitude,
-                                longitudeDelta: 0.5,
-                                latitudeDelta: 0.5,
+                                longitudeDelta: 0.9,
+                                latitudeDelta: 0.9,
                             }}
                             onPress={(e)=>{
                                 tempLongitude= e.nativeEvent.coordinate.longitude;
