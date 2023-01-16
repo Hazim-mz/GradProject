@@ -7,10 +7,12 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 import { GlobalStyles } from "../../constants/styles";
 import Date from "./Date";
+import Star from "../common/Star";
 
-function MainInformation({data, onPressLocation, onPressBook}){ 
+function MainInformation({data, onPressLocation, onPressBook, todayDate, bookedDates}){ 
 
     const [date, setDate] = useState('');
+    const [choosingDay, setChoosingDay] = useState('');
     const [calendarIsVisible, setCalendarIsVisible] = useState(false);
     function openCalendar(){
         setCalendarIsVisible(true);
@@ -18,15 +20,16 @@ function MainInformation({data, onPressLocation, onPressBook}){
     function closeCalendar(){
         setCalendarIsVisible(false);
     }
-    function changedate(date){
+    function changedate(date,day){
         setDate(date);
+        setChoosingDay(day);
         closeCalendar();
     }
 
     return(
         <View style={styles.mainInfoContainer}>
 
-            <Date visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {data.bookedDays} length={data.bookedDays.length}/>
+            <Date visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {bookedDates} todayDate={todayDate}/>
 
             <View style={styles.maininfo}>
                 <View>
@@ -52,12 +55,7 @@ function MainInformation({data, onPressLocation, onPressBook}){
                         <Text style={{fontSize:17}}>Guests</Text>
                     </View>
                 </View>
-                <View style={styles.guestsInfoContainer}>
-                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
-                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
-                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
-                    <Ionicons style={styles.map} name="star" size='18' color='#bfba22' />
-                </View>
+                    <Star rate={data.rate} size={18} />
             </View>
 
             <View style={styles.maininfo3}>
@@ -80,6 +78,15 @@ function MainInformation({data, onPressLocation, onPressBook}){
                 </Pressable>
 
                 <View style={styles.BookContainer}>
+                    <View>
+                        {
+                            choosingDay == '' ? <View></View> 
+                            :
+                            <View style={styles.choosingDayContainer}>
+                                <Text style={styles.choosingDayText}>{choosingDay}</Text>
+                            </View> 
+                        }
+                    </View>
                     <View style={styles.calendar}>
                         <Pressable
                                 style={({pressed}) => (
@@ -176,6 +183,14 @@ const styles = StyleSheet.create({
     BookContainer:{
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    choosingDayContainer:{
+        marginRight: 4,
+    },
+    choosingDayText:{
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: GlobalStyles.colors.primary10,
     },
     calendar:{
         marginRight: 8
