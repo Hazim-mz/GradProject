@@ -1,15 +1,39 @@
-import { ScrollView, View, Text, Image, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Image, Pressable,StyleSheet } from "react-native";
+import { useState } from "react";
+import Star from "../common/Star";
 
-function HallComment({data}){
+import { db } from '../../config'; 
+import { collection, where, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
+
+
+function HallComment({reviews }){
+    const [reportedCommentIDs, setReportedCommentIDs] = useState([]);
+    async function addReportToComment (id, report){
+        let reported = true 
+        for(var i =0; i<reportedCommentIDs.length; i++){
+            if(reportedCommentIDs[i] = id)
+                reported = false
+        }
+        if(reported){
+            const docRef = doc(db, "Review", id);
+
+            await updateDoc(docRef, {
+                Report: report+1
+            });
+            reportedCommentIDs.push(id);
+        }
+    }
+
     return(
         <View style={styles.bigContainer}>
+            <Text style={styles.boldName}>Comments: </Text>
             <ScrollView
-                style={{flex: 1, maxHeight: 500}}
+                style={{flex: 1, maxHeight: 500, minHeight: 300}}
                 showsHorizontalScrollIndicator={false}
             >
                 {
-                    data.map((comment, index) => (
-                        <View style={styles.container} key={comment.commentID}>
+                    reviews.map((review, index) => (
+                        <View style={styles.container} key={review.id}>
                             <View style={styles.bigImageContainer}>
                                 <View style={styles.imageContainer}>
                                     <Image style={styles.image1} source={require('../../assets/images/user.jpg')} resizeMode='cover'/>
@@ -17,10 +41,19 @@ function HallComment({data}){
                             </View>
                             <View style={styles.commentContainer}>
                                 <View style={styles.nameContainer}>
-                                    <Text style={styles.boldName}>{comment.UserName}</Text>
+                                    <Text style={styles.boldName}>{review.data.UserID}</Text>
+                                    <Star size={12} rate={review.data.Rate} style={{marginTop: 2}}/>
                                 </View>
                                 <View style={styles.textContainer}>
-                                    <Text style={styles.normalName}>{comment.text}</Text>
+                                    <Text style={styles.normalName}>{review.data.Comment}</Text>
+                                    <View style={styles.reportContainer}>
+                                        <Pressable
+                                            style={({pressed}) => pressed ? styles.pressable1 : null }
+                                            onPress={addReportToComment.bind(this, review.id, review.data.Report)}
+                                        >
+                                            <Text style={styles.reportText}>Report</Text>
+                                        </Pressable>
+                                    </View>
                                 </View>
                             </View>
                         </View>
@@ -38,6 +71,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         marginHorizontal: 4,
+        paddingTop: 4,
+        paddingLeft: 6,
         borderBottomLeftRadius:3,
         borderBottomRightRadius:3,
     },
@@ -59,6 +94,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         overflow: 'hidden',
+        borderWidth: 0.7,
     },
     image1:{
         width: '100%',
@@ -70,9 +106,12 @@ const styles = StyleSheet.create({
     },
     nameContainer:{
         flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
     },
     boldName:{
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 'bold',
     },
     normalName:{
@@ -81,5 +120,19 @@ const styles = StyleSheet.create({
     textContainer:{
         flex: 4,
         paddingLeft: 6,
+    },
+    reportContainer:{
+        flexDirection: 'row-reverse',
+        justifyContent: 'flex-start',
+        marginRight: 250,
+        marginTop: 20,
+    },
+    pressable1:{
+        opacity: 0.6
+    },
+    reportText:{
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: 'red'
     },
 });
