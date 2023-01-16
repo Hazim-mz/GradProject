@@ -4,43 +4,74 @@ import { useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import { GlobalStyles } from "../../constants/styles";
 
-function EnterReview(){
+function EnterReview({onPress}){
     const [rate, setRate] = useState(0);
+    const [comment, setComment] = useState('');
 
+    const [emptyRate, setEmptyRate] = useState('#bfba22');//false
+    const [emptyComment, setEmptyComment] = useState(false);
+
+    function send(){
+        if(comment == ''){
+            alert('Comment field is empty');
+            setEmptyComment(true);
+            setEmptyRate('#bfba22');//false
+        }
+        else if(rate == 0){
+            alert('Rate field is empty');
+            setEmptyRate('red');//true
+            setEmptyComment(false);
+        }
+        else{
+            setEmptyComment(false);
+            setEmptyRate('#bfba22');//false
+
+            setComment('');
+            setRate(0);
+            onPress(comment, rate, '???');
+        }
+    }
     return(
         <View style={styles.commentContainer}>
             <Text style={styles.boldName}>Enter you comment: </Text>
 
-            <TextInput style={styles.textIput1} multiline={true} autoCorrect={false}/>
+            <TextInput 
+                style={emptyComment ? [styles.textIput1,{borderColor: 'red'}] : styles.textIput1} 
+                multiline={true} 
+                autoCorrect={false}
+                onChangeText={newComment => setComment(newComment)}
+                defaultValue={comment}
+            />
+
             <View style={styles.ratingContainer2}>
-                <View style={styles.ratingContainer2}>
+                <View style={styles.ratingContainer2 }>
                     <Pressable
-                        onPress={() => setRate(1)}
+                        onPress={() => {setRate(1); setEmptyRate('#bfba22');}}
                     >
-                        <Ionicons style={styles.map} name={rate > 0 ? 'star' : 'star-outline'} size='22' color='#bfba22' />
+                        <Ionicons style={styles.map} name={rate > 0 ? 'star' : 'star-outline'} size='22' color={emptyRate} />
                     </Pressable>
                     <Pressable
-                        onPress={() => setRate(2)}
+                        onPress={() => {setRate(2); setEmptyRate('#bfba22');}}
                     >
-                        <Ionicons style={styles.map} name={rate > 1 ? 'star' : 'star-outline'} size='22' color='#bfba22' />
+                        <Ionicons style={styles.map} name={rate > 1 ? 'star' : 'star-outline'} size='22' color={emptyRate} />
                     </Pressable>
                     <Pressable
-                        onPress={() => setRate(3)}
+                        onPress={() => {setRate(3); setEmptyRate('#bfba22');}}
                     >
-                        <Ionicons style={styles.map} name={rate > 2 ? 'star' : 'star-outline'} size='22' color='#bfba22' />
+                        <Ionicons style={styles.map} name={rate > 2 ? 'star' : 'star-outline'} size='22' color={emptyRate} />
                     </Pressable>
                     <Pressable
-                        onPress={() => setRate(4)}
+                        onPress={() => {setRate(4); setEmptyRate('#bfba22');}}
                     >
-                        <Ionicons style={styles.map} name={rate > 3 ? 'star' : 'star-outline'} size='22' color='#bfba22' />
+                        <Ionicons style={styles.map} name={rate > 3 ? 'star' : 'star-outline'} size='22' color={emptyRate} />
                     </Pressable>
                     <Pressable
-                        onPress={() => setRate(5)}
+                        onPress={() => {setRate(5); setEmptyRate('#bfba22');}}
                     >
-                        <Ionicons style={styles.map} name={rate > 4 ? 'star' : 'star-outline'} size='22' color='#bfba22' />
+                        <Ionicons style={styles.map} name={rate > 4 ? 'star' : 'star-outline'} size='22' color={emptyRate} />
                     </Pressable>
                 </View>
-                <Button title="Send" color='#a73dcc'/>
+                <Button title="Send" color='#a73dcc' onPress={send}/>
             </View>
 
             
