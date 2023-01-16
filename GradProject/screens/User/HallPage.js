@@ -1,29 +1,59 @@
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState, useEffect, useRef } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Button, Platform, StyleSheet } from "react-native";
+import { useScrollToTop } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
+import DropDownPicker from 'react-native-dropdown-picker';
 
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { FontAwesome5 } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { HALLS } from '../../data/dummy-data';
-import { COMMENTS } from '../../data/dummy-data2';
 import HallImage from "../../components/common/HallImage";
 import { GlobalStyles } from "../../constants/styles";
 import MainInformation from "../../components/hallCom/MainInformation";
 import RoomInformation from "../../components/hallCom/RoomInformation";
-import ServiecesIcon from "../../components/hallCom/ServiecesIcon";
 import DescriptionInformation from "../../components/hallCom/DescriptionInformation";
 import ServiecesInformation from "../../components/hallCom/ServiecesInformation";
-import HallForm from "../../components/ManageHall/HallForm";
 import EnterReview from "../../components/hallCom/EnterReview";
 import HallComment from "../../components/hallCom/HallComment";
+import LodingOverlay from "../../components/UI/LodingOverlay";
 
-import { auth,db,storage } from '../../config'; 
-import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../config'; 
+import { collection, where, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
+
 
 
 function HallPage({route, navigation}){
+    const [isSubmitting, setIsSubmitting] = useState(false);//for loding if book hall
+    const [openReport, setOpenReport] = useState(false);
+
+    //report on hall
+    function reportOnHall(){
+        if(openReport){
+            setOpenReport(false);
+        }
+        else{
+            setOpenReport(true);
+        }
+    }
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => {
+                return (
+                    <Pressable onPress={reportOnHall} style={({pressed}) => pressed ? styles.pressable1 : null}>
+                        <MaterialCommunityIcons name="dots-vertical" size={24} color="white" />                    
+                    </Pressable>
+                );
+                
+            }
+        });
+    }, [navigation, reportOnHall]);
+
+    async function addReportToHall (){
+        const docRef = doc(db, "Halls",  displayedHall.id);
+
+        await updateDoc(docRef, {
+            Report: displayedHall.report+1
+        });
+    }
 
     //معلومات القاعة
     const displayedHall ={
@@ -34,16 +64,39 @@ function HallPage({route, navigation}){
         guests: route.params.hallGuests,
         imageUrl: route.params.hallImageUrl,
         services: route.params.hallServices,
-        bookedDays: route.params.hallBookedDays,
         locationOfHall: route.params.locationOfHall,
         locationOfUser: route.params.locationOfUser,
+        report: route.params.hallReport,
+        rate: route.params.hallRate,
     };
-    //console.log(displayedHall.locationOfHall);
-    //console.log(displayedHall.locationOfUser);
-    const displayedComment = COMMENTS.filter((commentItem) => {
-        return commentItem.hallID == displayedHall.id;
-    });
 
+    //the booked date of hall
+    const [bookedDates, setBookedDates] = useState([]);
+    const [reviews, setReviews] = useState([]);//the reviews of the hall
+    useEffect(()=>{
+        //get the booked date
+        const dates = query(collection(db, "Reservation"), where("HallsID", "==", displayedHall.id));
+        onSnapshot(dates, (Reservation) =>{
+            setBookedDates(Reservation.docs.map((reservations) =>({
+                    id: reservations.id,
+                    data: reservations.data()
+                }))
+            )
+        });
+        //get the reviews 
+        const review = query(collection(db, "Review"), where("HallsID", "==", displayedHall.id));
+        onSnapshot(review, (Comment) =>
+            setReviews(Comment.docs.map((comment) =>({
+                    id: comment.id,
+                    data: comment.data()
+                }))
+            )
+        );
+    },[]);
+    //console.log(reviews);
+
+   
+    //get location of the hall
     function pressLoctionHandler(){
         const tempIos ="googleMaps://app?saddr="+displayedHall.locationOfUser.latitude+", "+displayedHall.locationOfUser.longitude+"&daddr="+displayedHall.locationOfHall.latitude+", "+displayedHall.locationOfHall.longitude;
         const tempAndroid ="google.navigation:q="+displayedHall.locationOfHall.latitude+", "+displayedHall.locationOfHall.longitude;
@@ -53,8 +106,11 @@ function HallPage({route, navigation}){
               : tempAndroid,
         );  
     }
-    
+    //console.log(displayedHall.locationOfHall);
+
+    //add new Reservation
     const hallReservation = async(hallsID, date, price, userID) => {
+        setIsSubmitting(true);
         const ReservationID = await addDoc(collection(db, "Reservation"), {
             HallsID: hallsID,
             Date: date,
@@ -62,31 +118,78 @@ function HallPage({route, navigation}){
             UserID: userID
         }).
         then(()=>{
+            setIsSubmitting(false);
             alert("The hall is booked successsfilly");
         })
         navigation.navigate('Bookings');
     }
     //console.log(displayedHall.bookedDays);
+    
+    //add new Review
+    const addReview = async(comment, rate, userID) => {
+        //4+3+2 == 9/3 the rate 3
+        let rateOfhall = (reviews.length * displayedHall.rate) + rate;//3*3+5 = 14
+        rateOfhall = rateOfhall/(reviews.length+1);//14/4 = 3.5 new rate
+        
+        const ComentID = await addDoc(collection(db, "Review"), {
+            HallsID: displayedHall.id,
+            Comment: comment,
+            Rate: rate,
+            UserID: userID
+        })
+        const docRef = doc(db, "Halls", displayedHall.id);
+
+        await updateDoc(docRef, {
+            Rate: rateOfhall
+        });
+    }
+
+    //get today date for cleander
+    var day = new Date().getDate();
+    var month = new Date().getMonth() + 1;
+    var year = new Date().getFullYear();
+    var todayDate ;
+    if(day < 10)
+        todayDate = year + '-' + month + '-0'+day;
+    else if(month < 10)
+        todayDate = year + '-0' + month + '-'+day;
+    else
+        todayDate = year + '-' + month + '-'+day;
+
+    if(isSubmitting){
+        return <LodingOverlay text={"The hall is now booked, wait a second"}/>;
+    }
+
     return(
         <View style={styles.container}>
-            <ScrollView style={{flex: 1}}>
-                <View style={{flex: 1}}>
+            <ScrollView 
+                style={{flex: 1}}
+            >
+                <View style={{flex: 1, flexDirection: 'row-reverse'}}>
                     <HallImage 
                         data={displayedHall.imageUrl}
                         style={styles.imageContainer}
+                        press={false}
                     />
+
                 </View>
 
                 <ScrollView style={{flex: 1}}>
                     <KeyboardAvoidingView style={{flex:1}} behavior="padding">
                         <View style={styles.InfoContainer}>
-
+                            
                             {/* المعلومات الاساسية */}
-                            <MainInformation data={displayedHall} onPressLocation={pressLoctionHandler} onPressBook={hallReservation} />
+                            <MainInformation 
+                                data={displayedHall} 
+                                onPressLocation={pressLoctionHandler} 
+                                onPressBook={hallReservation} 
+                                todayDate={todayDate}
+                                bookedDates={bookedDates}
+                            />
 
                             <View style={styles.line}></View>
 
-                            {/* المعلومات الغرف */}
+                            {/* المعلومات عن الغرف */}
                             <RoomInformation />
                             
                             <View style={styles.line}></View>
@@ -103,17 +206,31 @@ function HallPage({route, navigation}){
 
                             <View style={styles.line}></View>
 
-                            <EnterReview />
+                            <EnterReview onPress={addReview} />
 
                             <View style={styles.line2}></View>
 
-                            <HallComment data={displayedComment}/>
+                            <HallComment reviews={reviews} />
                             
 
                         </View>
                     </KeyboardAvoidingView>
                 </ScrollView>
             </ScrollView>
+            {
+            openReport 
+                ? 
+                    <View style={styles.reportContainer}>
+                        <Pressable 
+                            style={({pressed}) => pressed ? [styles.reportTextContainer, styles.pressable1] : styles.reportTextContainer }
+                            onPress={addReportToHall}
+                        >
+                            <Text style={styles.reportText}>Report</Text>
+                        </Pressable>
+                    </View>
+                :
+                    <View></View>
+            }
         </View>
     );
 }
@@ -124,11 +241,40 @@ const styles = StyleSheet.create({
     container:{
         flex: 1
     },
+    pressable1:{
+        opacity: 0.7
+    },
     imageContainer:{
         flex: 1,
         width: 375,
         height: 282,
         overflow: 'hidden',
+        
+    },
+    reportContainer:{
+        position:'absolute', 
+        minHeight: 55,
+        minWidth: 60, 
+        backgroundColor:'black',
+        opacity: 0.7,
+        marginRight: 26,
+        paddingLeft: 2,
+        paddingTop: 4,
+        alignItems: 'center',
+        right: 2,
+        top: 0,
+        borderWidth:1,
+        borderBottomRightRadius:2,
+        borderBottomLeftRadius: 2,
+    },
+    reportTextContainer:{
+        paddingHorizontal: 0,
+        borderBottomWidth: 1,
+        borderColor: 'white',
+    },
+    reportText:{
+        color: 'white',
+        marginBottom: 2,
     },
     InfoContainer:{
         flex: 1,
