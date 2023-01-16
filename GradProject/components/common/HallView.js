@@ -8,9 +8,10 @@ import { GlobalStyles } from "../../constants/styles";
 
 import HallImage from "./HallImage";
 import DescriptionInformation from "../hallCom/DescriptionInformation";
+import Star from "./Star";
 
 
-function HallView({id, name, description, price, guests, imageUrl, services, bookedDays, locationOfHall, locationOfUser}){
+function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate}){
     const navigation = useNavigation(); //لانه مب صفحة
 
     function selectHallHandler(){
@@ -22,9 +23,10 @@ function HallView({id, name, description, price, guests, imageUrl, services, boo
             hallGuests: guests,
             hallImageUrl: imageUrl,      
             hallServices: services,
-            hallBookedDays: bookedDays,
             locationOfHall: locationOfHall,
             locationOfUser: locationOfUser,
+            hallReport: report,
+            hallRate: rate,
         });
     }
     
@@ -36,6 +38,7 @@ function HallView({id, name, description, price, guests, imageUrl, services, boo
                     data={imageUrl} 
                     onPress={selectHallHandler}
                     style={styles.imageContainer}
+                    press={true}
                 />
             </View>
             <Pressable 
@@ -49,10 +52,7 @@ function HallView({id, name, description, price, guests, imageUrl, services, boo
                             <Text style={styles.boldName}>{name}</Text>
                         </View>
                         <View style={styles.info}>
-                            <Ionicons style={styles.map} name="star" size='15' color='#bfba22' />
-                            <Ionicons style={styles.map} name="star" size='15' color='#bfba22' />
-                            <Ionicons style={styles.map} name="star" size='15' color='#bfba22' />
-                            <Ionicons style={styles.map} name="star" size='15' color='#bfba22' />
+                            <Star size={15} rate={rate}/>
                         </View>
                     </View>
 
