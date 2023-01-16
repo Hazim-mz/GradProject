@@ -1,24 +1,23 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, Keyboard,StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 
-import { collection, setDoc, doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { collection, where, query, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../../config';
 
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { Fontisto } from '@expo/vector-icons'; 
+import { Ionicons, MaterialCommunityIcons, Fontisto, FontAwesome,FontAwesome5 } from '@expo/vector-icons';
 
 import HallList from '../../components/common/HallList';
 import Sort from '../../components/homeCom/Sort';
 import LodingOverlay from '../../components/UI/LodingOverlay';
+import Search from '../../components/homeCom/Search';
 
 function Home({navigation, route}){
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [Halls, setHalls] = useState([]);
-    const [bookedDays, setBookedDays] = useState([]);
-
+    
+    //Sort Function
     const [sortIsVisible, setSortIsVisible] = useState(false);
     function openSort(){
         setSortIsVisible(true);
@@ -28,6 +27,27 @@ function Home({navigation, route}){
     }
     function SortHalls(Halls){
         setHalls(Halls);
+    }
+
+    //Search Fuction
+    const [oldHalls, setOldHalls] = useState([]);//to show the previous hall before the search
+    const [startSearch, setStartSearch] = useState(false);//to show x button to cancel the search
+    const [search, setSearch] = useState('');//name of the hall you search for 
+    function StartEnterNameOfHall(name){
+        setSearch(name);
+    }
+    function StartSearch(halls){
+        if(oldHalls.length == 0){
+            setOldHalls(Halls);//old
+        }
+        setStartSearch(true);
+        setHalls(halls);//new
+    }
+    function CancelSearch(){
+        Keyboard.dismiss();
+        setHalls(oldHalls);
+        setStartSearch(false);
+        setSearch('');
     }
 
     //call Halls from DB
@@ -40,19 +60,9 @@ function Home({navigation, route}){
                 }))
             )
         );
-
-        const reff = collection(db, "Reservation");
-        onSnapshot(reff, (Reservation) =>
-            setBookedDays(Reservation.docs.map((reservations) =>({
-                    id: reservations.id,
-                    data: reservations.data()
-                }))
-            )
-        );
-       
+        
     }, []);
-
-
+    //console.log(Halls);
     const [locationOfUser, setLocationOfUser] = useState({
         latitude: -1,
         longitude: -1
@@ -83,14 +93,19 @@ function Home({navigation, route}){
     return(
         <View style={styles.container}>
 
-            <Sort Halls={Halls} SortHalls={SortHalls} visible={sortIsVisible} close={closeSort}/>
+            <Sort Halls={Halls} SortHalls={SortHalls} locationOfUser={locationOfUser} visible={sortIsVisible} close={closeSort}/>
 
             <View style={styles.searchBar}>
 
-                <View style={styles.searchBar1}>
-                    <TextInput style={styles.search}/>
-                    <Ionicons style={styles.map} name="map" size='30' color='#6A2B81' />
-                </View>
+                <Search 
+                    EnteredName={search} 
+                    StartEnterNameOfHall={StartEnterNameOfHall} 
+                    startSearch={startSearch} 
+                    halls={Halls}
+                    oldHalls={oldHalls} 
+                    SearchFuntion={StartSearch} 
+                    CancelSearch={CancelSearch}
+                />
 
                 <View style={styles.searchBar2}>
                     <Pressable 
@@ -126,7 +141,7 @@ function Home({navigation, route}){
 
             <View style={{flex: 3}}>
                 <View style={styles.hallContainer}>
-                    <HallList Halls={Halls} BookedDays={bookedDays} LocationOfUser={locationOfUser}/>
+                    <HallList Halls={Halls} LocationOfUser={locationOfUser}/>
                 </View>
             </View>
         </View>
@@ -150,15 +165,34 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
     },
-    search:{
+    searchContainer:{
         flex: 6,
         borderWidth: 1,
         borderRadius: 8,
         margin: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
         shadowColor: 'black',
         shadowOffset:{width: 0, height: 2},
         shadowRadius: 6,
         shadowOpacity: 0.25
+    },
+    search:{
+        flex: 6,
+        borderBottomLeftRadius: 8,
+        borderTopLeftRadius: 8,
+        height: '100%',
+        fontSize: 18,
+    },
+    searchButton:{
+        flex: 6,
+        borderBottomRightRadius: 7,
+        borderTopRightRadius: 7,
+        backgroundColor: '#1a54ab',
+        height: 15,
+        width: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     map:{
         flex: 1,
