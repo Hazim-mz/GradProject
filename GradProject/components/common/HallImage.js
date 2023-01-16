@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
 
-function HallImage({data, onPress, style}){
+function HallImage({data, onPress, press,style}){
     const [imageActive, setImageActive] = useState(0);
 
     function onScrollHandler({nativeEvent}){
@@ -24,7 +24,7 @@ function HallImage({data, onPress, style}){
                     data.map((image, index) => (
                         <Pressable 
                         key={index}
-                        style={({pressed}) => (pressed ? styles.button : null)}
+                        style={({pressed}) => (pressed && press ? styles.button : null)}
                         onPress={onPress}
                         >
                             <View style={style}>
@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
+        position:'absolute'
     },
     textContainer:{
         flexDirection: 'row',
