@@ -15,6 +15,7 @@ function Sort({Halls, SortHalls, visible, close}){
     const [state, setState] = useState(initialState);
 
     useEffect(() => {
+
         if(state.highPrice) {
             const highPriceHalls = Halls.sort((a, b) => {
                 return b.data.Price - a.data.Price;
@@ -27,25 +28,33 @@ function Sort({Halls, SortHalls, visible, close}){
             });
             SortHalls.bind(this, lowPriceHalls);
         }
+
         if(state.highGuest) {
+            //1-if(highPrice), 2-else if(lowPrice), 3-Do
             const highGuestHalls = Halls.sort((a, b) => {
                 return b.data.Guests - a.data.Guests;
             });
             SortHalls.bind(this, highGuestHalls);
         }
         else if(state.lowGuest) {
+            //1-if(highPrice), 2-else if(lowPrice), 3-Do
             const lowGuestHalls = Halls.sort((a, b) => {
                 return a.data.Guests - b.data.Guests;
             });
             SortHalls.bind(this, lowGuestHalls);
         }
+
         if(state.farLocation) {
+            //1-if(highPrice && highGuest), 2-else if(highPrice && lowGuest), 3-else if(lowPrice && highGuest), 4-else if(lowPrice && lowGuest)
+            //5-if(highPrice), 6-else if(lowPrice), 7-else if(highGuest), 8-else if(lowGuest) 9- Do
             const farLocationHalls = Halls.sort((a, b) => {
                 return (b.data.Location.latitude - a.data.Location.latitude)+(b.data.Location.longitude - a.data.Location.longitude);
             });
             SortHalls.bind(this, farLocationHalls);
         }
         else if(state.nearLocation) {
+            //1-if(highPrice && highGuest), 2-else if(highPrice && lowGuest), 3-else if(lowPrice && highGuest), 4-else if(lowPrice && lowGuest)
+            //5-if(highPrice), 6-else if(lowPrice), 7-else if(highGuest), 8-else if(lowGuest) 9- Do
             const nearLocationHalls = Halls.sort((a, b) => {
                 return (a.data.Location.latitude - b.data.Location.latitude)+(a.data.Location.longitude - b.data.Location.longitude);
             });
