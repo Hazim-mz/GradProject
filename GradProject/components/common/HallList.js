@@ -1,142 +1,67 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { useState,useCallback, useEffect } from "react";
+import { View, FlatList, RefreshControl, StyleSheet } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { GlobalStyles } from "../../constants/styles";
+import HallView from "./HallView";
 
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
-import HallImage from "./HallImage";
-import DescriptionInformation from "../hallCom/DescriptionInformation";
-import Star from "./Star";
-
-
-function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate}){
-    const navigation = useNavigation(); //لانه مب صفحة
-
-    function selectHallHandler(){
-        navigation.navigate('HallPage', {
-            hallId: id,
-            hallName: name,
-            hallDescription: description,
-            hallPrice: price,
-            hallGuests: guests,
-            hallImageUrl: imageUrl,      
-            hallServices: services,
-            locationOfHall: locationOfHall,
-            locationOfUser: locationOfUser,
-            hallReport: report,
-            hallRate: rate,
-        });
-    }
+function HallList({Halls ,LocationOfUser, navigation}){
+    const [refreshing, setRefreshing] = useState(false);
     
-    return(
-        <View style={styles.container}>
-            
-            <View style={{flex: 3}}>
-                <HallImage 
-                    data={imageUrl} 
-                    onPress={selectHallHandler}
-                    style={styles.imageContainer}
-                    press={true}
-                />
-            </View>
-            <Pressable 
-                style={({pressed}) => (pressed ? styles.button : null)}
-                onPress={selectHallHandler}
-            >
-                <View style={styles.infoContainer}>
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        wait(500).then(() => setRefreshing(false));
+    }, []);
 
-                    <View style={styles.info}>
-                        <View>
-                            <Text style={styles.boldName}>{name}</Text>
-                        </View>
-                        <View style={styles.info}>
-                            <Star size={15} rate={rate}/>
-                        </View>
-                    </View>
+    //كل اكله لها عنصر
+    function renderHallInfo(itemData){
+        const item = itemData.item;
+        const hallInfoProps ={
+            id: item.id, //هذا عشان نعرف ايدي قاعة اللي بننتقل لها بعدين
+            name: item.data.Name,
+            description: item.data.Description,
+            price: item.data.Price,
+            guests: item.data.Guests,
+            imageUrl: item.data.imageUrl,
+            services: item.data.Services,
+            locationOfHall: item.data.Location,
+            locationOfUser: LocationOfUser,
+            report: item.data.Report,
+            rate: item.data.Rate,
+        };
+        return (
+            <HallView {...hallInfoProps}/>
+        );
+    }
 
-                    <View style={styles.info}>
-                        <View>
-                            <Text style={styles.normalName}>Riyadh, alnada</Text>
-                        </View>
-                        <View style={styles.info}>
-                            <Text style={styles.boldName}>{price}</Text>
-                            <Text style={styles.normalName}>SR</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.info2}>
-                        <View>
-                            <MaterialCommunityIcons 
-                                name="account-group" 
-                                size={30} color= 
-                                {GlobalStyles.colors.primary10} 
-                            />
-                        </View>
-                        <View style={styles.info3}>
-                            <Text style={styles.boldName}>{guests}, </Text>
-                            <Text style={styles.normalName}>Guests</Text>
-                        </View>
-                    </View>
-
-                </View>
-            </Pressable>
+    return( 
+        //عرض القاعات
+        <View style={styles.view1}>
+            <FlatList
+                style={styles.flat1}
+                data={Halls}
+                keyExtractor={(item) => item.id}
+                renderItem={renderHallInfo}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            />
         </View>
     );
 }
 
-export default HallView;
+export default HallList;
 
 const styles = StyleSheet.create({
-    container:{
-        margin: 8,
-        borderRadius: 8,
-        backgroundColor: 'white',
-        shadowColor: 'black',
-        shadowOffset:{width: 0, height: 2},
-        shadowRadius: 8,
-        shadowOpacity: 0.05,
-        overflow: Platform.OS === 'android' ? 'hidden' : 'visible',
-    },
-    button:{
-        opacity: 0.8,
-    },
-    imageContainer:{
+    view1:{
         flex: 1,
-        borderTopRightRadius: 8,
-        borderTopLeftRadius: 8,
-        width: 359,
-        height: 282,
-        overflow: 'hidden',
     },
-    image1:{
-        width: '100%',
-        height: '100%',
-    },
-    infoContainer:{
+    flat1:{
         flex: 1,
-        justifyContent: 'space-between',
-        margin: 2,
     },
-    info:{
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    info2:{
-        flexDirection: 'row',
-    },
-    info3:{
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-        marginLeft: 4,
-    },
-    boldName:{
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    normalName:{
-        fontSize: 12,
-    },
-});
+  });
