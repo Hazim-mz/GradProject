@@ -144,18 +144,6 @@ function HallPage({route, navigation}){
         });
     }
 
-    //get today date for cleander
-    var day = new Date().getDate();
-    var month = new Date().getMonth() + 1;
-    var year = new Date().getFullYear();
-    var todayDate ;
-    if(day < 10)
-        todayDate = year + '-' + month + '-0'+day;
-    else if(month < 10)
-        todayDate = year + '-0' + month + '-'+day;
-    else
-        todayDate = year + '-' + month + '-'+day;
-
     if(isSubmitting){
         return <LodingOverlay text={"The hall is now booked, wait a second"}/>;
     }
@@ -183,7 +171,6 @@ function HallPage({route, navigation}){
                                 data={displayedHall} 
                                 onPressLocation={pressLoctionHandler} 
                                 onPressBook={hallReservation} 
-                                todayDate={todayDate}
                                 bookedDates={bookedDates}
                             />
 
