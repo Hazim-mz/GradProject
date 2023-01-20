@@ -6,13 +6,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons'; 
 
 import { GlobalStyles } from "../../constants/styles";
-import Date from "./Date";
+import Calendars from "./Calendars";
 import Star from "../common/Star";
 
-function MainInformation({data, onPressLocation, onPressBook, todayDate, bookedDates}){ 
+function MainInformation({data, onPressLocation, onPressBook, bookedDates}){ 
 
     const [date, setDate] = useState('');
     const [choosingDay, setChoosingDay] = useState('');
+    const [choosingMonth, setChoosingMonth] = useState('');
     const [calendarIsVisible, setCalendarIsVisible] = useState(false);
     function openCalendar(){
         setCalendarIsVisible(true);
@@ -20,16 +21,17 @@ function MainInformation({data, onPressLocation, onPressBook, todayDate, bookedD
     function closeCalendar(){
         setCalendarIsVisible(false);
     }
-    function changedate(date,day){
+    function changedate(date, day, month){
         setDate(date);
         setChoosingDay(day);
+        setChoosingMonth(month);
         closeCalendar();
     }
 
     return(
         <View style={styles.mainInfoContainer}>
 
-            <Date visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {bookedDates} todayDate={todayDate}/>
+            <Calendars visible={calendarIsVisible} dateFromCalendar={changedate} bookedDates= {bookedDates} />
 
             <View style={styles.maininfo}>
                 <View>
@@ -83,7 +85,7 @@ function MainInformation({data, onPressLocation, onPressBook, todayDate, bookedD
                             choosingDay == '' ? <View></View> 
                             :
                             <View style={styles.choosingDayContainer}>
-                                <Text style={styles.choosingDayText}>{choosingDay}</Text>
+                                <Text style={styles.choosingDayText}>{choosingDay}/{choosingMonth}</Text>
                             </View> 
                         }
                     </View>
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
     choosingDayText:{
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: 'bold',
         color: GlobalStyles.colors.primary10,
     },
