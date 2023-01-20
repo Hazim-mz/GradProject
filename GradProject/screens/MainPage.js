@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthContext } from '../store/auth-context';
 import UserPage from './User/UserPage';
-import AdminPage from './Admin/AdminPage';
+import OwnerPage from './Owner/OwnerPage';
 
 function MainPage(){
     const userAccountCtx = useContext(AuthContext);
@@ -13,7 +13,7 @@ function MainPage(){
             return(
                 <View style={{flex: 1}}>
                     <StatusBar style="auto" />
-                    <AdminPage/>
+                    <OwnerPage/>
                 </View>
             );
         }
