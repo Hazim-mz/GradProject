@@ -11,6 +11,8 @@ import HallList from '../../components/common/HallList';
 import Sort from '../../components/homeCom/Sort';
 import LodingOverlay from '../../components/UI/LodingOverlay';
 import Search from '../../components/homeCom/Search';
+import AvailableDate from '../../components/homeCom/AvailableDate';
+import Filter from '../../components/homeCom/Filter';
 
 function Home({navigation, route}){
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,23 +31,67 @@ function Home({navigation, route}){
         setHalls(Halls);
     }
 
+    //Filter Function
+    const [hallsBeforeFilter, setHallsBeforeFilter] = useState([]);//to show the previous hall before the choose avalible date 
+    const [startFilter, setStartFilter] = useState(false);//to show x button to cancel choosing avalible date 
+    const [filterIsVisible, setFilterIsVisible] = useState(false);
+    function openFilter(){
+        setFilterIsVisible(true);
+    }
+    function closeFilter(){
+        setFilterIsVisible(false);
+    }
+    function cancelFilter(){
+        setStartFilter(false);
+        setHalls(hallsBeforeDate);
+    }
+    function FilterHalls(Halls){
+        if(hallsBeforeFilter.length == 0){
+            setHallsBeforeFilter(Halls);//old
+        }
+        setStartFilter(true);
+        setHalls(Halls);//new
+    }
+
+    //Date Function
+    const [hallsBeforeDate, setHallsBeforeDate] = useState([]);//to show the previous hall before the choose avalible date 
+    const [startDate, setStartDate] = useState(false);//to show x button to cancel choosing avalible date 
+    const [dateIsVisible, setDateIsVisible] = useState(false);
+    function openDate(){
+        setDateIsVisible(true);
+    }
+    function closeDate(){
+        setDateIsVisible(false);
+    }
+    function cancelAvalibleDate(){
+        setStartDate(false);
+        setHalls(hallsBeforeDate);
+    }
+    function avalibleHalls(halls){
+        if(hallsBeforeDate.length == 0){
+            setHallsBeforeDate(Halls);//old
+        }
+        setStartDate(true);
+        setHalls(halls);//new
+    }
+
     //Search Fuction
-    const [oldHalls, setOldHalls] = useState([]);//to show the previous hall before the search
+    const [hallsBeforeSorting, setHallsBeforeSorting] = useState([]);//to show the previous hall before the search
     const [startSearch, setStartSearch] = useState(false);//to show x button to cancel the search
     const [search, setSearch] = useState('');//name of the hall you search for 
     function StartEnterNameOfHall(name){
         setSearch(name);
     }
     function StartSearch(halls){
-        if(oldHalls.length == 0){
-            setOldHalls(Halls);//old
+        if(hallsBeforeSorting.length == 0){
+            setHallsBeforeSorting(Halls);//old
         }
         setStartSearch(true);
         setHalls(halls);//new
     }
     function CancelSearch(){
         Keyboard.dismiss();
-        setHalls(oldHalls);
+        setHalls(hallsBeforeSorting);
         setStartSearch(false);
         setSearch('');
     }
@@ -63,13 +109,15 @@ function Home({navigation, route}){
         
     }, []);
     //console.log(Halls);
+
+    //get loction of the user
     const [locationOfUser, setLocationOfUser] = useState({
         latitude: -1,
         longitude: -1
     });
     useEffect(() => {
         (async () => {
-            setIsSubmitting(true);
+            //setIsSubmitting(true);
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 console.log('Permission to access location was denied');
@@ -82,7 +130,7 @@ function Home({navigation, route}){
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude
             });
-            setIsSubmitting(false);
+            //setIsSubmitting(false);
         })();
     }, []);
 
@@ -93,7 +141,29 @@ function Home({navigation, route}){
     return(
         <View style={styles.container}>
 
-            <Sort Halls={Halls} SortHalls={SortHalls} locationOfUser={locationOfUser} visible={sortIsVisible} close={closeSort}/>
+            <Sort 
+                Halls={Halls} 
+                SortHalls={SortHalls} 
+                locationOfUser={locationOfUser} 
+                visible={sortIsVisible} 
+                close={closeSort}
+            />
+
+            <Filter
+                Halls={Halls}
+                oldHalls={hallsBeforeFilter} 
+                FilterHalls={FilterHalls}
+                visible={filterIsVisible}
+                close={closeFilter}
+            />
+
+            <AvailableDate 
+                Halls={Halls} 
+                oldHalls={hallsBeforeDate} 
+                avalibleHalls={avalibleHalls}
+                visible={dateIsVisible} 
+                close={closeDate}
+            />
 
             <View style={styles.searchBar}>
 
@@ -102,7 +172,7 @@ function Home({navigation, route}){
                     StartEnterNameOfHall={StartEnterNameOfHall} 
                     startSearch={startSearch} 
                     halls={Halls}
-                    oldHalls={oldHalls} 
+                    oldHalls={hallsBeforeSorting} 
                     SearchFuntion={StartSearch} 
                     CancelSearch={CancelSearch}
                 />
@@ -117,24 +187,57 @@ function Home({navigation, route}){
                             <Text>sort</Text>
                         </View>
                     </Pressable>
-                    <Pressable 
-                        style={({pressed}) => (pressed ? styles.button : null)}
-                        onPress={openSort} 
-                    >
-                        <View style={styles.icon}>
-                            <MaterialCommunityIcons name="filter" size={30} color="#6A2B81" />
-                            <Text>Filter</Text>
-                        </View>
-                    </Pressable>
-                    <Pressable 
-                        style={({pressed}) => (pressed ? styles.button : null)}
-                        onPress={openSort} 
-                    >                        
-                        <View style={styles.icon}>
-                            <Fontisto name="date" size={30} color="#6A2B81" />
-                            <Text> Date</Text>
-                        </View>
-                    </Pressable>
+
+                    <View style={styles.FilterContainer}>
+                        {
+                            startFilter 
+                            ?
+                                <Pressable
+                                    onPress={cancelFilter}
+                                    style={styles.cencelButtonContainer}
+                                >
+                                    <Text style={styles.cencelButton}>X</Text>
+                                </Pressable>
+                            :
+                                <View></View>
+
+                        }
+                        <Pressable 
+                            style={({pressed}) => (pressed ? styles.button : null)}
+                            onPress={openFilter} 
+                        >
+                            <View style={startDate ?  [styles.icon,{marginLeft: 18}] : styles.icon}>
+                                <MaterialCommunityIcons name="filter" size={30} color="#6A2B81" />
+                                <Text>Filter</Text>
+                            </View>
+                        </Pressable>
+                    </View>
+
+                    <View style={styles.DateContainer}>
+                        {
+                            startDate 
+                            ?
+                                <Pressable
+                                    onPress={cancelAvalibleDate}
+                                    style={styles.cencelButtonContainer}
+                                >
+                                    <Text style={styles.cencelButton}>X</Text>
+                                </Pressable>
+                            :
+                                <View></View>
+
+                        }
+                        <Pressable 
+                            style={({pressed}) => (pressed ? styles.button : null)}
+                            onPress={openDate} 
+                        >                        
+                            <View style={styles.icon}>
+                                <Fontisto name="date" size={30} color="#6A2B81" />
+                                <Text> Date</Text>
+                            </View>
+                        </Pressable>
+                    </View>
+
                 </View>
 
             </View>
@@ -214,6 +317,20 @@ const styles = StyleSheet.create({
     icon:{
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    FilterContainer:{
+        flexDirection: 'row',
+    },
+    DateContainer:{
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    cencelButtonContainer:{
+    },
+    cencelButton:{
+        marginTop: 3,
+        marginRight: 5,
+        fontSize: 20,
     },
     hallContainer:{
         flex: 1,
