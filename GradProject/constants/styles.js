@@ -1,6 +1,7 @@
 export const GlobalStyles = {
     colors: {
       primary10: '#6A2B81',
+      primary20: '#792f94',
       primary50: '#e4d9fd',
       primary100: '#c6affc',
       primary200: '#a281f0',
@@ -15,3 +16,17 @@ export const GlobalStyles = {
       gray700: '#221c30',
     },
   };
+export const Colors = {
+  primary100: '#f9beda',
+  primary500: '#c30b64',
+  primary800: '#610440',
+  error100: '#fcdcbf',
+  error500: '#f37c13',
+  white: '#fff',
+  black: '#000',
+  blue: '#5D5FEE',
+  grey: '#BABBC3',
+  light: '#F3F4FB',
+  darkBlue: '#7978B5',
+  red: 'red',
+};
