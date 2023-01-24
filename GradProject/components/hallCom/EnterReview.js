@@ -3,16 +3,28 @@ import { useState } from "react";
 
 import { Ionicons } from '@expo/vector-icons';
 import { GlobalStyles } from "../../constants/styles";
+import GoToLoginPage from "../common/GoToLoginPage";
 
-function EnterReview({onPress}){
+function EnterReview({onPress, account}){
     const [rate, setRate] = useState(0);
     const [comment, setComment] = useState('');
 
     const [emptyRate, setEmptyRate] = useState('#bfba22');//false
     const [emptyComment, setEmptyComment] = useState(false);
 
+    const [goToLoginPageIsVisible, setGoToLoginPageIsVisible] = useState(false);
+    function openLoginPage(){
+        setGoToLoginPageIsVisible(true);
+    }
+    function closeLoginPage(){
+        setGoToLoginPageIsVisible(false);
+    }
+
     function send(){
-        if(comment == ''){
+        if(! account.isAuthenticated){
+            openLoginPage();
+        }
+        else if(comment == ''){
             alert('Comment field is empty');
             setEmptyComment(true);
             setEmptyRate('#bfba22');//false
@@ -28,11 +40,14 @@ function EnterReview({onPress}){
 
             setComment('');
             setRate(0);
-            onPress(comment, rate, '???');
+            onPress(comment, rate, account.name, account.userID, account.image);
         }
     }
     return(
         <View style={styles.commentContainer}>
+
+            <GoToLoginPage isVisible={goToLoginPageIsVisible} close={closeLoginPage}/>
+
             <Text style={styles.boldName}>Enter you comment: </Text>
 
             <TextInput 
