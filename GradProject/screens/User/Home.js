@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, Keyboard,StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 
-import { collection, where, query, onSnapshot } from 'firebase/firestore';
+import { collection, where, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { auth, db } from '../../config';
 
 import { Ionicons, MaterialCommunityIcons, Fontisto, FontAwesome,FontAwesome5 } from '@expo/vector-icons';
@@ -98,7 +98,7 @@ function Home({navigation, route}){
 
     //call Halls from DB
     useLayoutEffect(() => {
-        const ref = collection(db, "Halls");
+        const ref = query(collection(db, "Halls"), orderBy("Rate", "desc"));
         onSnapshot(ref, (Halls) =>
             setHalls(Halls.docs.map((Hall) =>({
                     id: Hall.id,
@@ -110,30 +110,6 @@ function Home({navigation, route}){
     }, []);
     //console.log(Halls);
 
-    //get loction of the user
-    const [locationOfUser, setLocationOfUser] = useState({
-        latitude: -1,
-        longitude: -1
-    });
-    useEffect(() => {
-        (async () => {
-            //setIsSubmitting(true);
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                return;
-            }
-        
-            let location = await Location.getCurrentPositionAsync({});
-            //console.log(location);
-            setLocationOfUser({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
-            });
-            //setIsSubmitting(false);
-        })();
-    }, []);
-
     if(isSubmitting){
         return <LodingOverlay text={"Get your Loction"}/>;
     }
@@ -144,7 +120,7 @@ function Home({navigation, route}){
             <Sort 
                 Halls={Halls} 
                 SortHalls={SortHalls} 
-                locationOfUser={locationOfUser} 
+                locationOfUser={route.params.locationOfUser} 
                 visible={sortIsVisible} 
                 close={closeSort}
             />
@@ -244,7 +220,7 @@ function Home({navigation, route}){
 
             <View style={{flex: 3}}>
                 <View style={styles.hallContainer}>
-                    <HallList Halls={Halls} LocationOfUser={locationOfUser}/>
+                    <HallList Halls={Halls} LocationOfUser={route.params.locationOfUser} booking={false}/>
                 </View>
             </View>
         </View>
