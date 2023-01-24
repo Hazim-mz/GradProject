@@ -6,7 +6,7 @@ import { db } from '../../config';
 import { collection, where, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
 
 
-function HallComment({reviews }){
+function HallComment({ reviews, account }){
     const [reportedCommentIDs, setReportedCommentIDs] = useState([]);
     async function addReportToComment (id, report){
         let reported = true 
@@ -36,12 +36,12 @@ function HallComment({reviews }){
                         <View style={styles.container} key={review.id}>
                             <View style={styles.bigImageContainer}>
                                 <View style={styles.imageContainer}>
-                                    <Image style={styles.image1} source={require('../../assets/images/user.jpg')} resizeMode='cover'/>
+                                    <Image style={styles.image1} source={{uri: review.data.UserImage}} resizeMode='cover'/>
                                 </View>
                             </View>
                             <View style={styles.commentContainer}>
                                 <View style={styles.nameContainer}>
-                                    <Text style={styles.boldName}>{review.data.UserID}</Text>
+                                    <Text style={styles.boldName}>{review.data.UserName}</Text>
                                     <Star size={12} rate={review.data.Rate} style={{marginTop: 2}}/>
                                 </View>
                                 <View style={styles.textContainer}>
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         overflow: 'hidden',
-        borderWidth: 0.7,
+        borderWidth: 0.8,
     },
     image1:{
         width: '100%',
