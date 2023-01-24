@@ -1,8 +1,12 @@
-import UserPage from "./screens/User/UserPage";
+import MainPage from "./screens/MainPage";
+import AuthContextProvider from './store/auth-context';
 
 export default function App() {
   return (
-    <UserPage />
+    <AuthContextProvider>
+      <MainPage />
+    </AuthContextProvider>
+    
   );
 }
 
