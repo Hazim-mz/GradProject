@@ -7,14 +7,14 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-function HallList({Halls ,LocationOfUser, navigation}){
+function HallList({Halls ,LocationOfUser, booking, deleateReservations, navigation}){
     const [refreshing, setRefreshing] = useState(false);
     
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         wait(500).then(() => setRefreshing(false));
     }, []);
-
+    
     //كل اكله لها عنصر
     function renderHallInfo(itemData){
         const item = itemData.item;
@@ -30,6 +30,11 @@ function HallList({Halls ,LocationOfUser, navigation}){
             locationOfUser: LocationOfUser,
             report: item.data.Report,
             rate: item.data.Rate,
+            //for booking page ->
+            cancelAvailable: item.cancelAvailable,
+            date: item.Date,
+            booking: booking,
+            deleateReservations: deleateReservations
         };
         return (
             <HallView {...hallInfoProps}/>
@@ -42,7 +47,7 @@ function HallList({Halls ,LocationOfUser, navigation}){
             <FlatList
                 style={styles.flat1}
                 data={Halls}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item, index) => index.toString()}
                 renderItem={renderHallInfo}
                 refreshControl={
                     <RefreshControl
