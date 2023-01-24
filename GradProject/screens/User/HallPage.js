@@ -1,8 +1,6 @@
-import { useLayoutEffect, useState, useEffect, useRef } from "react";
+import { useLayoutEffect, useState, useEffect, useContext } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Button, Platform, StyleSheet } from "react-native";
-import { useScrollToTop } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
-import DropDownPicker from 'react-native-dropdown-picker';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -15,13 +13,17 @@ import ServiecesInformation from "../../components/hallCom/ServiecesInformation"
 import EnterReview from "../../components/hallCom/EnterReview";
 import HallComment from "../../components/hallCom/HallComment";
 import LodingOverlay from "../../components/UI/LodingOverlay";
+import { AuthContext } from "../../store/auth-context";
 
 import { db } from '../../config'; 
 import { collection, where, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
+import GoToLoginPage from "../../components/common/GoToLoginPage";
 
 
 
 function HallPage({route, navigation}){
+    const userAccountCtx = useContext(AuthContext);
+    //console.log(userAccountCtx); 
     const [isSubmitting, setIsSubmitting] = useState(false);//for loding if book hall
     const [openReport, setOpenReport] = useState(false);
 
@@ -109,24 +111,38 @@ function HallPage({route, navigation}){
     //console.log(displayedHall.locationOfHall);
 
     //add new Reservation
-    const hallReservation = async(hallsID, date, price, userID) => {
-        setIsSubmitting(true);
-        const ReservationID = await addDoc(collection(db, "Reservation"), {
-            HallsID: hallsID,
-            Date: date,
-            Price: price,
-            UserID: userID
-        }).
-        then(()=>{
-            setIsSubmitting(false);
-            alert("The hall is booked successsfilly");
-        })
-        navigation.navigate('Bookings');
+    const [goToLoginPageIsVisible, setGoToLoginPageIsVisible] = useState(false);
+    function openLoginPage(){
+        setGoToLoginPageIsVisible(true);
+    }
+    function closeLoginPage(){
+        setGoToLoginPageIsVisible(false);
+    }
+    const hallReservation = async(hallsID, date, price, userID) => { 
+        if(! userAccountCtx.isAuthenticated){
+            openLoginPage();
+        }
+        else{
+            setIsSubmitting(true);
+            const ReservationID = await addDoc(collection(db, "Reservation"), {
+                HallsID: hallsID,
+                Date: date,
+                Price: price,
+                UserID: 'n6powR3d2pk4GwUEcKbs'
+            }).
+            then(()=>{
+                setIsSubmitting(false);
+                alert("The hall is booked successsfilly");
+            })
+            navigation.navigate('Bookings',{
+                update: true,
+            });
+        }
     }
     //console.log(displayedHall.bookedDays);
     
     //add new Review
-    const addReview = async(comment, rate, userID) => {
+    const addReview = async(comment, rate, userName, userID, userImage) => {
         //4+3+2 == 9/3 the rate 3
         let rateOfhall = (reviews.length * displayedHall.rate) + rate;//3*3+5 = 14
         rateOfhall = rateOfhall/(reviews.length+1);//14/4 = 3.5 new rate
@@ -135,7 +151,9 @@ function HallPage({route, navigation}){
             HallsID: displayedHall.id,
             Comment: comment,
             Rate: rate,
-            UserID: userID
+            UserName: userName,
+            UserID: userID,
+            UserImage: userImage
         })
         const docRef = doc(db, "Halls", displayedHall.id);
 
@@ -150,6 +168,9 @@ function HallPage({route, navigation}){
 
     return(
         <View style={styles.container}>
+
+            <GoToLoginPage isVisible={goToLoginPageIsVisible} close={closeLoginPage}/>
+
             <ScrollView 
                 style={{flex: 1}}
             >
@@ -193,11 +214,11 @@ function HallPage({route, navigation}){
 
                             <View style={styles.line}></View>
 
-                            <EnterReview onPress={addReview} />
+                            <EnterReview onPress={addReview} account={userAccountCtx}/>
 
                             <View style={styles.line2}></View>
 
-                            <HallComment reviews={reviews} />
+                            <HallComment reviews={reviews} account={userAccountCtx}/>
                             
 
                         </View>
