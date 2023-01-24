@@ -23,7 +23,7 @@ const initialServices = [
     {name:'Cooking', isAvailable: false}
 ];
 
-function Inbox({route, navigation}){
+function Inbox({navigation, route}){
     const [isSubmitting, setIsSubmitting] = useState(false);
     
     //Services
@@ -32,38 +32,32 @@ function Inbox({route, navigation}){
     const [guests, setGuests] = useState('');
     const [description, setDescription] = useState('');
     const [services, setServices] = useState(initialServices);
-    const [locationOfHall, setLocationOfHall] = useState({
-        latitude: -1,
-        longitude: -1
-    });
+    const [locationOfHall, setLocationOfHall] = useState(route.params.locationOfUser);
 
     //get Location og the user
-    const [locationOfUser, setLocationOfUser] = useState({
-        latitude: -1,
-        longitude: -1
-    });
-    useEffect(() => {
-        (async () => {
-            setIsSubmitting(true);
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                return;
-            }
+    const [locationOfUser, setLocationOfUser] = useState(route.params.locationOfUser);
+    // useEffect(() => {
+    //     (async () => {
+    //         setIsSubmitting(true);
+    //         let { status } = await Location.requestForegroundPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             console.log('Permission to access location was denied');
+    //             return;
+    //         }
         
-            let location = await Location.getCurrentPositionAsync({});
-            //console.log(location);
-            setLocationOfUser({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
-            });
-            setLocationOfHall({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
-            });
-            setIsSubmitting(false);
-        })();
-    }, []);
+    //         let location = await Location.getCurrentPositionAsync({});
+    //         //console.log(location);
+    //         setLocationOfUser({
+    //             latitude: location.coords.latitude,
+    //             longitude: location.coords.longitude
+    //         });
+    //         setLocationOfHall({
+    //             latitude: location.coords.latitude,
+    //             longitude: location.coords.longitude
+    //         });
+    //         setIsSubmitting(false);
+    //     })();
+    // }, []);
     var tempLatitude;
     var tempLongitude;
 
@@ -167,12 +161,12 @@ function Inbox({route, navigation}){
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve(imagesLocation.length);
-                }, 5000);
+                }, images.length*5000);
             }); 
         }
         const uploadHall = async() => {
             await uploadImage();
-            if(imagesLocation && name && price && guests){
+            if(imagesLocation && name && price && guests && images.length == imagesLocation.length){
                 const HallID = await addDoc(collection(db, "Halls"), {
                     OwnerEmail: '??',
                     Name: name,
@@ -199,7 +193,7 @@ function Inbox({route, navigation}){
                 })
                 navigation.navigate('Home');
             }else{
-                alert("Please wait");
+                alert("Error occurred while upload the Hall");
             }
         }
         uploadHall();
@@ -301,8 +295,8 @@ function Inbox({route, navigation}){
                             initialRegion={{
                                 longitude: locationOfUser.longitude,
                                 latitude: locationOfUser.latitude,
-                                longitudeDelta: 0.9,
-                                latitudeDelta: 0.9,
+                                longitudeDelta: 0.2,
+                                latitudeDelta: 0.2,
                             }}
                             onPress={(e)=>{
                                 tempLongitude= e.nativeEvent.coordinate.longitude;
