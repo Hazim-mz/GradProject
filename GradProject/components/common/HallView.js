@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Button } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -11,7 +11,7 @@ import DescriptionInformation from "../hallCom/DescriptionInformation";
 import Star from "./Star";
 
 
-function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate}){
+function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate, cancelAvailable, date, booking, deleateReservations}){
     const navigation = useNavigation(); //لانه مب صفحة
 
     function selectHallHandler(){
@@ -29,7 +29,7 @@ function HallView({id, name, description, price, guests, imageUrl, services, loc
             hallRate: rate,
         });
     }
-    
+        
     return(
         <View style={styles.container}>
             
@@ -75,8 +75,24 @@ function HallView({id, name, description, price, guests, imageUrl, services, loc
                             />
                         </View>
                         <View style={styles.info3}>
-                            <Text style={styles.boldName}>{guests}, </Text>
-                            <Text style={styles.normalName}>Guests</Text>
+                            <View style={styles.guestsContainer}>
+                                <Text style={styles.boldName}>{guests}, </Text>
+                                <Text style={styles.normalName}>Guests</Text>
+                            </View>
+                            {
+                                booking ?
+                                    cancelAvailable ?
+                                        <Pressable
+                                            style={({pressed}) => ( pressed ? [styles.buttonPressed, styles.button] : styles.button)}
+                                            onPress={deleateReservations.bind(this, id, date)}
+                                        >
+                                            <Text style={styles.cancel}>Cancel</Text>
+                                        </Pressable>
+                                    :
+                                        <View></View>
+                                :
+                                    <View></View>
+                            }
                         </View>
                     </View>
 
@@ -125,12 +141,25 @@ const styles = StyleSheet.create({
     },
     info2:{
         flexDirection: 'row',
+        alignItems: 'center',
     },
     info3:{
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 8,
         marginLeft: 4,
+        alignContent: 'space-between',
+        justifyContent: 'space-between'
+    },
+    guestsContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    button:{
+        marginLeft: 206
+    },
+    buttonPressed:{
+        opacity: 0.8,
     },
     boldName:{
         fontSize: 12,
@@ -138,5 +167,10 @@ const styles = StyleSheet.create({
     },
     normalName:{
         fontSize: 12,
+    },
+    cancel:{
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: 'red'
     },
 });
