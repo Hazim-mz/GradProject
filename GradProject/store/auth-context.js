@@ -6,8 +6,10 @@ export const AuthContext = createContext({
   name: '',
   email: '',
   userID: '',
+  uID: '',
   rule: '',
   record: '',
+  image: '',
   token: '',
   isAuthenticated: false,
   authenticate: (token) => {},
@@ -23,16 +25,18 @@ function AuthContextProvider({ children }) {
   }
 
   function logout() {
-    setAuthToken(null);
+    setAuthToken({});
     AsyncStorage.removeItem('token');
   }
 
   const value = {
     name: authToken.name,
     email: authToken.email,
-    userID: authToken.localId,
+    userID: authToken.userID,
+    uID: authToken.uID,
     rule: authToken.rule,
     record: authToken.record,
+    image: authToken.image,
     token: authToken.idToken,
     isAuthenticated: !!authToken.idToken,
     authenticate: authenticate,
