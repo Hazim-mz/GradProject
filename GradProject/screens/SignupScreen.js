@@ -16,8 +16,7 @@ function SignupScreen() {
     async function signupHandler({ email, password, name, record, rule }) {
         setIsAuthenticating(true);
         try {
-            console.log('signupHandler: ', rule, record);
-            const token = await createUser(name, email, password, record, rule);
+            const token = await createUser(email, password, name, record, rule);
             authCtx.authenticate(token);
             navigation.navigate('HomeOverview');
         } catch (error) {
