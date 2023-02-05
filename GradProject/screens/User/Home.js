@@ -1,11 +1,12 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TextInput, Pressable, Keyboard,StyleSheet } from 'react-native';
+import { useEffect, useLayoutEffect, useState, useContext } from 'react';
+import { View, Text, TextInput, Pressable, Keyboard,StyleSheet, Alert } from 'react-native';
 import * as Location from 'expo-location';
 
 import { collection, where, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { auth, db } from '../../config';
 
 import { Ionicons, MaterialCommunityIcons, Fontisto, FontAwesome,FontAwesome5 } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
 
 import HallList from '../../components/common/HallList';
 import Sort from '../../components/homeCom/Sort';
@@ -13,11 +14,35 @@ import LodingOverlay from '../../components/UI/LodingOverlay';
 import Search from '../../components/homeCom/Search';
 import AvailableDate from '../../components/homeCom/AvailableDate';
 import Filter from '../../components/homeCom/Filter';
+import HallMap from '../../components/homeCom/HallMap';
+
+import { AuthContext } from "../../store/auth-context";
+
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => {
+        return{
+            shouldShowAlert: true,
+            shouldPlaySound: false,
+            shouldSetBadge: false,
+        };
+    },
+});
 
 function Home({navigation, route}){
+    const userAccountCtx = useContext(AuthContext);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [Halls, setHalls] = useState([]);
+    
+    //Sort Function
+    const [mapIsVisible, setMapIsVisible] = useState(false);
+    function openMap(){
+        setMapIsVisible(true);
+    }
+    function closeMap(){
+        setMapIsVisible(false);
+    }
     
     //Sort Function
     const [sortIsVisible, setSortIsVisible] = useState(false);
@@ -43,14 +68,14 @@ function Home({navigation, route}){
     }
     function cancelFilter(){
         setStartFilter(false);
-        setHalls(hallsBeforeDate);
+        setHalls(hallsBeforeFilter);
     }
-    function FilterHalls(Halls){
+    function FilterHalls(halls){
         if(hallsBeforeFilter.length == 0){
             setHallsBeforeFilter(Halls);//old
         }
         setStartFilter(true);
-        setHalls(Halls);//new
+        setHalls(halls);//new
     }
 
     //Date Function
@@ -108,7 +133,51 @@ function Home({navigation, route}){
         );
         
     }, []);
-    //console.log(Halls);
+
+    //get notifications Address of the user after register 
+    // const [puchNotificationsAddress, setPuchNotificationsAddress] = useState('');
+    // useLayoutEffect(() => {
+    //     async function configurePuchNotifications(){
+    //         const { status } = await Notifications.getPresentedNotificationsAsync();
+    //         let finalStatus = status;
+
+    //         if(finalStatus !== 'granted'){
+    //             const { status } = await Notifications.requestPermissionsAsync();
+    //             finalStatus = status;
+    //         }
+
+    //         if(finalStatus !== 'granted'){
+    //             Alert.alert(
+    //                 'Permission required',
+    //                 'You no longer can get notifications about new reservation or review'
+    //             );
+    //             return;
+    //         }
+    //         const puchTokenData = await Notifications.getExpoPushTokenAsync();
+    //         console.log(puchTokenData);
+    //         setPuchNotificationsAddress(puchTokenData.data);
+    //     }
+    //     if(userAccountCtx.isAuthenticated){
+    //         configurePuchNotifications();
+    //         if(puchNotificationsAddress != ''){
+
+    //             const docRef1 = doc(db, "Users",  userAccountCtx.userID);
+    //             updateDoc(docRef1, {
+    //                 NotificationsAddress: puchNotificationsAddress
+    //             });
+
+    //             if(userAccountCtx.rule > 0.5){
+    //                 const docRef2 = doc(db, "Halls",  userAccountCtx.userID);
+    //                 updateDoc(docRef2, {
+    //                     OwnerNotifAddr: puchNotificationsAddress
+    //                 });
+    //             }
+
+    //             userAccountCtx.notificationsAddress = puchNotificationsAddress;
+    //         }
+    //     }
+        
+    // }, [userAccountCtx.isAuthenticated]);
 
     if(isSubmitting){
         return <LodingOverlay text={"Get your Loction"}/>;
@@ -116,6 +185,13 @@ function Home({navigation, route}){
 
     return(
         <View style={styles.container}>
+
+            <HallMap 
+                Halls={Halls}
+                locationOfUser={route.params.locationOfUser} 
+                visible={mapIsVisible}
+                close={closeMap}
+            />
 
             <Sort 
                 Halls={Halls} 
@@ -142,16 +218,23 @@ function Home({navigation, route}){
             />
 
             <View style={styles.searchBar}>
-
-                <Search 
-                    EnteredName={search} 
-                    StartEnterNameOfHall={StartEnterNameOfHall} 
-                    startSearch={startSearch} 
-                    halls={Halls}
-                    oldHalls={hallsBeforeSorting} 
-                    SearchFuntion={StartSearch} 
-                    CancelSearch={CancelSearch}
-                />
+                <View style={styles.searchBar1}>
+                    <Search 
+                        EnteredName={search} 
+                        StartEnterNameOfHall={StartEnterNameOfHall} 
+                        startSearch={startSearch} 
+                        halls={Halls}
+                        oldHalls={hallsBeforeSorting} 
+                        SearchFuntion={StartSearch} 
+                        CancelSearch={CancelSearch}
+                    />
+                    <Pressable 
+                        style={({pressed}) => (pressed ? [styles.button, styles.mapButton] : styles.mapButton)} 
+                        onPress={openMap}
+                    >
+                    <FontAwesome5 style={styles.map} name="map-marked-alt" size={30} color= '#6A2B81' />
+                    </Pressable>
+                </View>
 
                 <View style={styles.searchBar2}>
                     <Pressable 
@@ -244,38 +327,15 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
     },
-    searchContainer:{
-        flex: 6,
-        borderWidth: 1,
-        borderRadius: 8,
-        margin: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        shadowColor: 'black',
-        shadowOffset:{width: 0, height: 2},
-        shadowRadius: 6,
-        shadowOpacity: 0.25
-    },
-    search:{
-        flex: 6,
-        borderBottomLeftRadius: 8,
-        borderTopLeftRadius: 8,
-        height: '100%',
-        fontSize: 18,
-    },
-    searchButton:{
-        flex: 6,
-        borderBottomRightRadius: 7,
-        borderTopRightRadius: 7,
-        backgroundColor: '#1a54ab',
-        height: 15,
-        width: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     map:{
         flex: 1,
         marginTop: 14,
+    },
+    mapButton:{
+        flex: 1,
+        alignItems: 'center',
+        paddingRight: 4,
+        marginRight: 4,
     },
     searchBar2:{
         backgroundColor: '#ECECEC',
