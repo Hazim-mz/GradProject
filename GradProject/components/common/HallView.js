@@ -11,7 +11,7 @@ import DescriptionInformation from "../hallCom/DescriptionInformation";
 import Star from "./Star";
 
 
-function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate, cancelAvailable, date, booking, deleateReservations}){
+function HallView({id, name, description, price, guests, imageUrl, services, locationOfHall, locationOfUser, report, rate, ownerID, ownerEmail, ownerNotifAddr, cancelAvailable, date, booking, deleateReservations}){
     const navigation = useNavigation(); //لانه مب صفحة
 
     function selectHallHandler(){
@@ -27,6 +27,9 @@ function HallView({id, name, description, price, guests, imageUrl, services, loc
             locationOfUser: locationOfUser,
             hallReport: report,
             hallRate: rate,
+            ownerID: ownerID,
+            ownerEmail: ownerEmail,
+            ownerNotifAddr: ownerNotifAddr,
         });
     }
         
