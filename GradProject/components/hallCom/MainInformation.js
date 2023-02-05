@@ -10,7 +10,7 @@ import Calendars from "./Calendars";
 import Star from "../common/Star";
 
 function MainInformation({data, onPressLocation, onPressBook, bookedDates}){ 
-
+    
     const [date, setDate] = useState('');
     const [choosingDay, setChoosingDay] = useState('');
     const [choosingMonth, setChoosingMonth] = useState('');
@@ -117,7 +117,7 @@ function MainInformation({data, onPressLocation, onPressBook, bookedDates}){
                                     style={({pressed}) => (
                                         pressed ? styles.button : null
                                     )}
-                                    onPress={onPressBook.bind(this, data.id, date, data.price, '???')}
+                                    onPress={onPressBook.bind(this, data.id, date, data.price)}
                                 >
                                     <View style={styles.buttonDesign}>
                                         <Text style={{color: 'white', fontWeight: 'bold'}}>Book</Text>
