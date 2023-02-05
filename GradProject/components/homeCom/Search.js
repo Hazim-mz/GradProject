@@ -24,7 +24,6 @@ function Search({EnteredName, StartEnterNameOfHall, startSearch, halls, oldHalls
         }
     }
     return(
-        <View style={styles.searchBar1}>
             <View style={styles.searchContainer}>
                 <TextInput 
                     style={styles.search} 
@@ -52,8 +51,6 @@ function Search({EnteredName, StartEnterNameOfHall, startSearch, halls, oldHalls
                     </View>
                 </Pressable>
             </View>
-            <FontAwesome5 style={styles.map} name="map-marked-alt" size={30} color= '#6A2B81' />
-        </View>
     );
 }
 
