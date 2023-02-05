@@ -16,7 +16,7 @@ import LodingOverlay from "../../components/UI/LodingOverlay";
 import { AuthContext } from "../../store/auth-context";
 
 import { db } from '../../config'; 
-import { collection, where, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, where, query, onSnapshot, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import GoToLoginPage from "../../components/common/GoToLoginPage";
 
 
@@ -70,34 +70,102 @@ function HallPage({route, navigation}){
         locationOfUser: route.params.locationOfUser,
         report: route.params.hallReport,
         rate: route.params.hallRate,
+        ownerID: route.params.ownerID,
+        ownerEmail: route.params.ownerEmail,
+        ownerNotifAddr: route.params.ownerNotifAddr,
     };
 
     //the booked date of hall
     const [bookedDates, setBookedDates] = useState([]);
     const [reviews, setReviews] = useState([]);//the reviews of the hall
+    const [owner, setOwner] = useState([]);
+    const [chat, setChat] = useState([]);
     useEffect(()=>{
         //get the booked date
-        const dates = query(collection(db, "Reservation"), where("HallsID", "==", displayedHall.id));
-        onSnapshot(dates, (Reservation) =>{
-            setBookedDates(Reservation.docs.map((reservations) =>({
-                    id: reservations.id,
-                    data: reservations.data()
+        const q = query(collection(db, "Reservation"), where("HallsID", "==", displayedHall.id));
+        onSnapshot(q, (Reservations) =>{
+            setBookedDates(Reservations.docs.map((Reservation) =>({
+                    id: Reservation.id,
+                    data: Reservation.data()
                 }))
             )
         });
         //get the reviews 
-        const review = query(collection(db, "Review"), where("HallsID", "==", displayedHall.id));
-        onSnapshot(review, (Comment) =>
-            setReviews(Comment.docs.map((comment) =>({
-                    id: comment.id,
-                    data: comment.data()
+        const qq = query(collection(db, "Review"), where("HallsID", "==", displayedHall.id));
+        onSnapshot(qq, (Comments) =>
+            setReviews(Comments.docs.map((Comment) =>({
+                    id: Comment.id,
+                    data: Comment.data()
                 }))
             )
         );
-    },[]);
-    //console.log(reviews);
 
-   
+        const qqq = query(collection(db, "Users"), where("Email", "==", displayedHall.ownerEmail));
+        onSnapshot(qqq, (Owners) =>
+            setOwner(Owners.docs.map((Owner) =>({
+                    id: Owner.id,
+                    data: Owner.data()
+                }))
+            )
+        );
+
+        if(userAccountCtx.isAuthenticated){
+            const qqqq = query(collection(db, "MessagesRequest"), where('OwnerID', '==', displayedHall.ownerID), where('UserID', '==', userAccountCtx.userID));
+            onSnapshot(qqqq, (Owners) =>
+                setChat(Owners.docs.map((Owner) =>({
+                        id: Owner.id,
+                        data: Owner.data()
+                    }))
+                )
+            );
+        }
+
+
+    },[]);
+
+    //chat with owner
+    async function contactWithOwner(){
+
+        if(userAccountCtx.isAuthenticated){
+            if(chat.length != 0){
+                console.log('owner');
+                navigation.navigate('Chat', {
+                    chatId: chat[0].id,
+                    chatReceiverInfo: owner,
+                    chatStart: chat[0].data.Start,
+                    chatUserID: userAccountCtx.userID,
+                    chatUserEmail: userAccountCtx.email,
+                    chatUserImage: userAccountCtx.image,
+                    chatUserRule: userAccountCtx.rule,
+                })
+            }
+            else{
+
+                const ChatID = await addDoc(collection(db, "MessagesRequest"), {
+                    OwnerID: displayedHall.ownerID,
+                    Start: false,
+                    UserID: userAccountCtx.userID,
+                    NewOwnerMes: 0,
+                    NewUserMes: 0,
+                    TimeOfLastMes: serverTimestamp(),
+                    LastMessage: '',
+                })
+
+                navigation.navigate('Chat', {
+                    chatId: ChatID.id,
+                    chatReceiverInfo: owner,
+                    chatStart: false,
+                    chatUserID: userAccountCtx.userID,
+                    chatUserEmail: userAccountCtx.email,
+                    chatUserImage: userAccountCtx.image,
+                    chatUserRule: userAccountCtx.rule,
+                })
+            }
+        }else{
+            openLoginPage();
+        }
+    }
+
     //get location of the hall
     function pressLoctionHandler(){
         const tempIos ="googleMaps://app?saddr="+displayedHall.locationOfUser.latitude+", "+displayedHall.locationOfUser.longitude+"&daddr="+displayedHall.locationOfHall.latitude+", "+displayedHall.locationOfHall.longitude;
@@ -110,7 +178,7 @@ function HallPage({route, navigation}){
     }
     //console.log(displayedHall.locationOfHall);
 
-    //add new Reservation
+    //check if user login before Book or add Review
     const [goToLoginPageIsVisible, setGoToLoginPageIsVisible] = useState(false);
     function openLoginPage(){
         setGoToLoginPageIsVisible(true);
@@ -118,7 +186,38 @@ function HallPage({route, navigation}){
     function closeLoginPage(){
         setGoToLoginPageIsVisible(false);
     }
-    const hallReservation = async(hallsID, date, price, userID) => { 
+
+    //fuction to send Notification to Owner if there is new Book or Review
+    // function sendPushNotificationHandler(eventType){
+    //     if(eventType == 'book'){
+    //         fetch('https://exp.host/--/api/v2/push/send',{
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'appliction/json'
+    //             },
+    //             body: JSON.stringify({
+    //                 to: displayedHall.ownerNotifAddr,
+    //                 title: 'New Reservation',
+    //                 body: 'There is new reservation'
+    //             })
+    //         });
+    //     }else{
+    //         fetch('https://exp.host/--/api/v2/push/send',{
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'appliction/json'
+    //             },
+    //             body: JSON.stringify({
+    //                 to: displayedHall.ownerNotifAddr,
+    //                 title: 'New Review',
+    //                 body: 'There is new review'
+    //             })
+    //         });
+    //     }
+    // }
+
+    //add new Reservation
+    const hallReservation = async(hallsID, date, price) => { 
         if(! userAccountCtx.isAuthenticated){
             openLoginPage();
         }
@@ -128,10 +227,11 @@ function HallPage({route, navigation}){
                 HallsID: hallsID,
                 Date: date,
                 Price: price,
-                UserID: 'n6powR3d2pk4GwUEcKbs'
+                UserID: userAccountCtx.userID
             }).
             then(()=>{
                 setIsSubmitting(false);
+                //sendPushNotificationHandler('book');
                 alert("The hall is booked successsfilly");
             })
             navigation.navigate('Bookings',{
@@ -160,6 +260,7 @@ function HallPage({route, navigation}){
         await updateDoc(docRef, {
             Rate: rateOfhall
         });
+        //sendPushNotificationHandler('review');
     }
 
     if(isSubmitting){
@@ -198,8 +299,15 @@ function HallPage({route, navigation}){
                             <View style={styles.line}></View>
 
                             {/* المعلومات عن الغرف */}
-                            <RoomInformation />
-                            
+                            {/* <RoomInformation /> */}
+
+                            <View style={styles.contactContainer}>
+                                <View style={styles.contactInformationTitle}>
+                                    <Text style={styles.boldName}>Contact with owner :</Text>
+                                    <Button title="contact" onPress={contactWithOwner}/>
+                                </View>
+                            </View>
+
                             <View style={styles.line}></View>
 
                             <View style={styles.descServContainer}>
@@ -322,6 +430,19 @@ const styles = StyleSheet.create({
     normalName:{
         fontSize: 12,
         textAlign:'center',
+    },
+    contactContainer:{
+        flex: 1,
+        marginHorizontal:4,
+        borderRadius:3,
+    },
+    contactInformationTitle:{
+        flex: 1,
+        backgroundColor: 'white',
+        borderRadius:3,
+        borderBottomRightRadius:0,
+        paddingTop:8,
+        paddingLeft:6,
     },
     descServContainer:{
         flex: 1,
