@@ -51,7 +51,9 @@ function Bookings({navigation, route}){
     var month = new Date().getMonth() + 1;
     var year = new Date().getFullYear();
     var todayDate ;
-    if(day < 10)
+    if(day < 10 && month < 10)
+        todayDate = year + '-0' + month + '-0'+day;
+    else if(day < 10)
         todayDate = year + '-' + month + '-0'+day;
     else if(month < 10)
         todayDate = year + '-0' + month + '-'+day;
