@@ -30,6 +30,10 @@ function HallList({Halls ,LocationOfUser, booking, deleateReservations, navigati
             locationOfUser: LocationOfUser,
             report: item.data.Report,
             rate: item.data.Rate,
+            //Owner infromation ->
+            ownerID: item.data.OwnerID,
+            ownerEmail: item.data.OwnerEmail,
+            ownerNotifAddr: item.data.OwnerNotifAddr,
             //for booking page ->
             cancelAvailable: item.cancelAvailable,
             date: item.Date,
