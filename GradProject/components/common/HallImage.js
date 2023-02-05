@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
 
-function HallImage({data, onPress, press,style}){
+function HallImage({data, onPress, press, style}){
     const [imageActive, setImageActive] = useState(0);
 
     function onScrollHandler({nativeEvent}){
