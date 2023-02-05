@@ -12,7 +12,7 @@ function GoToLoginPage({isVisible, close}) {
         close();
         navigation.navigate('LoginOverview');
     }
-
+    
     return (
       <View>
         <Modal isVisible={isVisible}>
