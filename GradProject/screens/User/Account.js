@@ -11,6 +11,7 @@ import ChangeName from "../../components/accountCom/ChangeName";
 import { GlobalStyles } from "../../constants/styles";
 import ChangeEmail from "../../components/accountCom/ChangeEmail";
 import ChangePassword from "../../components/accountCom/ChangePassword";
+import ChangeHallID from "../../components/accountCom/ChangeHallID";
 
 function Account({navigation, route}){
     const userAccountCtx = useContext(AuthContext);
@@ -68,6 +69,18 @@ function Account({navigation, route}){
         userAccountCtx.token = idToken;
     }
 
+    //change Hall ID if he owner
+    const [hallIDIsVisible, setHallIDIsVisible] = useState(false);
+    function openHallID(){
+        setHallIDIsVisible(true);
+    }
+    function closeHallID(){
+        setHallIDIsVisible(false);
+    }
+    function changeHallID(record){
+        userAccountCtx.record = record;
+    }
+
     const [numberOfReservations, setNumberOfReservations] = useState([]);
     const [image, setImage] = useState('https://icons.veryicon.com/png/o/internet--web/55-common-web-icons/person-4.png');
     useEffect(()=>{
@@ -106,6 +119,8 @@ function Account({navigation, route}){
                 <ChangeEmail oldEmail={userAccountCtx.email} userID={userAccountCtx.userID} idToken={userAccountCtx.token} changeEmail={changeEmail} visible={emailIsVisible} close={closeEmail}/>
 
                 <ChangePassword userID={userAccountCtx.userID} idToken={userAccountCtx.token} changePasword={changePasword} visible={passwordIsVisible} close={closePasword}/>
+
+                <ChangeHallID oldHallID={userAccountCtx.record} userID={userAccountCtx.userID} changeHallID={changeHallID} visible={hallIDIsVisible} close={closeHallID}/>
 
                 <View style={styles.subContainer1}>
                     <View style={styles.imageContainer}>
@@ -161,6 +176,25 @@ function Account({navigation, route}){
                                 <Entypo name="edit" size={18} color="black" />
                             </Pressable>
                         </View>
+
+                        {
+                            userAccountCtx.rule > 0 ?
+                                <View style={styles.emailContainer}>
+                                    <View style={styles.email}>
+                                        <Text style={styles.emailLabel}>Hall ID: </Text>
+                                        <Text style={styles.emailText}>{userAccountCtx.record}</Text>
+                                    </View>
+                                    <Pressable
+                                        style={({pressed}) => (pressed ? [styles.buttonPress, styles.button] : styles.button)}
+                                        onPress={openHallID}
+                                    >
+                                        <Entypo name="edit" size={18} color="black" />
+                                    </Pressable>
+                                </View>
+                            :
+
+                                <View></View>
+                        }
 
                         <View style={styles.bookContainer}>
                             <View style={styles.book}>
