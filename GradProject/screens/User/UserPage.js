@@ -12,7 +12,7 @@ import HallPage from './HallPage';
 import Inbox from './Inbox';
 import Bookings from './Bookings';
 import Account from './Account';
-//import Test from './Test';
+import Chat from './Chat';
 
 import LoginScreen from '../LoginScreen';
 import SignupScreen from '../SignupScreen';
@@ -22,7 +22,8 @@ const BottomTabs = createBottomTabNavigator();
 
 
 function UserPage({locationOfUser}) {
-    //Login Page 
+
+    //hide Login Page 
     function LoginOverview() {
         return (
             <Stack.Navigator
@@ -44,6 +45,7 @@ function UserPage({locationOfUser}) {
             </Stack.Navigator>
         );
     }
+
     //Home Page 
     function HomeOverview() {
         return (
@@ -61,6 +63,30 @@ function UserPage({locationOfUser}) {
             <Stack.Screen
                 name="HallPage"
                 component={HallPage}
+                initialParams={{locationOfUser: locationOfUser}}
+            />
+    
+            </Stack.Navigator>
+        );
+    }
+
+    //Inbox page
+    function InboxOverview() {
+        return (
+            <Stack.Navigator
+            screenOptions={{
+                headerStyle: { backgroundColor: GlobalStyles.colors.primary10 },
+                headerTintColor: 'white',
+            }}
+            >
+            <Stack.Screen
+                name="Inbox"
+                component={Inbox}
+                initialParams={{locationOfUser: locationOfUser}}
+            />
+            <Stack.Screen
+                name="Chat"
+                component={Chat}
                 initialParams={{locationOfUser: locationOfUser}}
             />
     
@@ -92,10 +118,10 @@ function UserPage({locationOfUser}) {
                     }}
                 />
                 <BottomTabs.Screen
-                    name="Inbox"
-                    component={Inbox}
-                    initialParams={{locationOfUser: locationOfUser}}
+                    name="InboxOverview"
+                    component={InboxOverview}
                     options={{
+                        headerShown: false,
                         title: 'Inbox',
                         tabBarLabel: 'Inbox',
                         tabBarIcon: ({ color, size }) => (
@@ -128,12 +154,12 @@ function UserPage({locationOfUser}) {
                     }}
                 />
                 {/* <BottomTabs.Screen
-                    name="Test"
-                    component={Test}
+                    name="Chat"
+                    component={Chat}
                     initialParams={{locationOfUser: locationOfUser}}
                     options={{
-                        title: 'Test',
-                        tabBarLabel: 'Test',
+                        title: 'Chat',
+                        tabBarLabel: 'Chat',
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="star" size={size} color={color} />
                         ),
