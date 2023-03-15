@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "Qaeati",
+    "slug": "GradProject",
+    "version": "2.0.6",
+    "orientation": "portrait",
+    "icon": "./assets/Q.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/Q2.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6A2B81"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "buildNumber": "2.0.6",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.qaeati.qaeati",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "To see the nearse hall.",
+        "NSLocationAlwaysUsageDescription": "To see the nearse hall.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "To see the nearse hall."
+      }
+    },
+    "android": {
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.qaeati.qaeati"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6d8ea028-0896-4e64-a51c-5edfd155390d"
+      }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "config": {
+              "googleMapsApiKey": "AIzaSyDwDENMUesiIxkFv_0EkVskbOe85fEvXm4"
+            }
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "To share your hall photos to users."
+        }
+      ]
+    ]
+  }
+}
